@@ -1,0 +1,1401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="Customer Purchase Behavior Analyzer: a Python and Streamlit project covering transaction cleaning, RFM segmentation, spending prediction and data-quality limits.">
+<meta name="author" content="Nikhil Kumar Vishwakrma">
+<link rel="icon" type="image/png" href="../../../../main-images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<script>document.documentElement.classList.add("js");</script>
+<title>Customer Purchase Behavior Analyzer | Nikhil Kumar Vishwakrma</title>
+<style>
+
+
+:root{
+  color-scheme:dark;
+  --bg:#000;
+  --ink:#f4f1ea;
+  --muted:#bdb7aa;
+  --dim:#8d877b;
+  --gold:#d8c18e;
+  --gold-2:#f1dfb4;
+  --line:rgba(255,255,255,.09);
+  --line-glass:rgba(255,255,255,.10);
+  --glass:linear-gradient(180deg,rgba(24,22,19,.97) 0%,rgba(14,13,11,.97) 100%);
+  --glass-blur:none;
+  --r-xl:30px;
+  --r-lg:24px;
+  --r-md:16px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --max:1160px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:#000;scroll-behavior:smooth;scroll-padding-top:104px;overflow-x:clip}
+body{margin:0;background:transparent;color:var(--ink);font:400 16px/1.7 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+h1,h2,h3,h4,p{margin:0}
+::selection{background:var(--gold);color:#000}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:12px}
+
+/* Layout helpers */
+.wrap{width:min(var(--max),calc(100% - 48px));margin-inline:auto}
+.skip{position:absolute;left:16px;top:-60px;z-index:100;padding:10px 16px;border-radius:999px;background:var(--gold);color:#000;font-weight:600;transition:top .2s}
+.skip:focus{top:12px}
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-2));transform:scaleX(0);transform-origin:0 50%;z-index:70}
+
+/* Background: the original champagne glow beneath the moving constellation. One static background and one canvas, no extra layers */
+.ambient{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:radial-gradient(ellipse 58% 52% at 12% 8%,rgba(216,193,142,.14),transparent 72%),radial-gradient(ellipse 48% 46% at 88% 28%,rgba(173,127,59,.09),transparent 76%),radial-gradient(ellipse 58% 52% at 57% 94%,rgba(128,93,45,.075),transparent 76%),#020202}
+.network-bg{position:absolute;inset:0;display:block;width:100%;height:100%;opacity:.85;pointer-events:none}
+.glyph-warm{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Frosted glass surface, shared by every card */
+.card{position:relative;isolation:isolate;overflow:hidden;border:1px solid var(--line-glass);border-radius:var(--r-lg);background:var(--glass);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);box-shadow:0 30px 60px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07);transition:border-color .45s var(--ease),transform .5s var(--ease);contain:layout style}
+.card:hover{border-color:rgba(216,193,142,.34)}
+@media (hover:hover) and (pointer:fine){.lift:hover{transform:translate3d(0,-4px,0)}}
+
+.kicker{display:inline-flex;align-items:center;margin-bottom:14px;color:var(--gold);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.h2{margin-bottom:14px;font-size:clamp(2rem,3.9vw,3.1rem);font-weight:700;line-height:1.1;letter-spacing:-.04em}
+.lead{max-width:64ch;color:var(--muted);font-size:1rem}
+
+/* Entrance and scroll-reveal motion */
+.enter{animation:rise .65s var(--ease) backwards;animation-delay:var(--d,0ms)}
+.js .reveal:not(.in){opacity:0}
+.reveal.in{animation:rise .55s var(--ease) backwards;animation-delay:var(--d,0ms)}
+@keyframes rise{from{opacity:0;transform:translate3d(0,12px,0)}to{opacity:1;transform:none}}
+@keyframes lineUp{from{transform:translate3d(0,108%,0)}to{transform:none}}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+/* Header: original floating glass menu bar */
+.site-header{position:sticky;top:10px;z-index:30;margin-top:10px;border:0;background:transparent}
+.nav-shell{min-height:70px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:8px 12px 8px 17px;border:1px solid rgba(246,229,198,.18);border-radius:999px;background:rgba(10,10,9,.94);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 14px 42px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06)}
+.brand{display:inline-flex;align-items:center;gap:12px;flex-shrink:0}
+.brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+}
+
+.brand-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 37%;
+    border-radius: inherit;
+}
+.brand-copy{display:grid;line-height:1.24}
+.brand-copy strong{font-size:.88rem;letter-spacing:-.015em}
+.brand-copy span{margin-top:3px;color:#a9a18f;font-size:.71rem}
+.nav-links{position:relative;display:flex;align-items:center;gap:3px;padding:5px;border:1px solid rgba(246,229,198,.075);border-radius:999px;background:rgba(255,244,220,.025)}
+.nav-links a{position:relative;z-index:1;padding:8px 13px;border-radius:999px;color:#d3c9b7;font-size:.83rem;font-weight:630;transition:color .18s,background .18s}
+.nav-links a:not(.nav-contact):hover,.nav-links a[aria-current="location"]:not(.nav-contact){color:#fff5df;background:rgba(216,193,142,.105)}
+.nav-links .nav-contact{padding:9px 18px;border:0;color:#21180b;background:linear-gradient(135deg,#f3dcae,#d8a452);box-shadow:0 5px 20px rgba(179,143,78,.22)}
+.nav-links .nav-contact:hover{color:#21180b;background:#f8e5bd}
+.nav-toggle{display:none;width:42px;height:42px;place-items:center;border:1px solid rgba(216,193,142,.25);border-radius:50%;color:var(--ink);background:rgba(216,193,142,.08);cursor:pointer}
+.nav-toggle svg{width:20px;height:20px}
+.nav-toggle[aria-expanded="true"]{color:#241a0e;background:#d8c18e}
+@keyframes menu-reveal{from{opacity:0;transform:translateY(-6px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Hero */
+.hero{position:relative;overflow:hidden;padding:clamp(48px,8vw,104px) 0 clamp(56px,7vw,88px)}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(40px,6vw,84px);align-items:center}
+.eyebrow{display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px;padding:7px 14px 7px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);color:var(--muted);font-size:.78rem;font-weight:500}
+.eyebrow .sep{width:1px;height:12px;background:rgba(255,255,255,.2)}
+/* .pulse{position:relative;width:8px;height:8px;border-radius:50%;
+  background:#4fd39a
+}
+.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;
+border:1px solid rgba(79,211,154,.6);
+animation:ping 2.4s var(--ease) infinite} */
+.display{margin:20px 0 24px;font-size:clamp(2.7rem,5.8vw,5rem);font-weight:700;line-height:1.02;letter-spacing:-.05em}
+.display .line{display:block;overflow:hidden;padding-bottom:.08em}
+.display .line>span{display:inline-block;animation:lineUp 1.05s var(--ease) both}
+.display .line:nth-child(2)>span{animation-delay:.14s}
+.display .accent{color:var(--gold)}
+.hero-intro{display:flex;align-items:center;gap:12px;margin-bottom:16px;color:var(--gold);font-size:.8rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;animation:rise .9s var(--ease) backwards}
+.hero-intro::before{content:"";width:28px;height:1px;background:var(--gold)}
+.hero-copy{max-width:58ch;margin-bottom:30px;color:var(--muted);font-size:clamp(1rem,1.3vw,1.08rem);line-height:1.75}
+.hero-copy strong{color:var(--ink);font-weight:600}
+.actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:0 22px;border:1px solid transparent;border-radius:999px;font-size:.9rem;font-weight:600;transition:transform .3s var(--ease),background .3s,border-color .3s,color .3s}
+.btn svg{width:16px;height:16px;flex:none;transition:transform .3s var(--ease)}
+.btn:hover{transform:translateY(-2px)}
+.btn:hover svg{transform:translate(2px,-2px)}
+.btn-primary{background:var(--gold);color:#000}
+.btn-primary:hover{background:var(--gold-2)}
+.btn-ghost{border-color:rgba(255,255,255,.18);color:var(--ink);background:rgba(255,255,255,.06);-webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur)}
+.btn-ghost:hover{border-color:rgba(216,193,142,.5);color:var(--gold)}
+.hero-meta{margin-top:22px;color:var(--dim);font-size:.84rem}
+.hero-meta strong{color:var(--muted);font-weight:500}
+
+.panel{padding:clamp(24px,3vw,34px);border-radius:var(--r-xl)}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:clamp(40px,5vw,56px)}
+.stat{padding:22px 22px 20px}
+.stat strong{display:block;font-size:clamp(1.7rem,2.6vw,2.2rem);font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:6px;color:var(--muted);font-size:.8rem;line-height:1.5}
+.stat-note{margin-top:14px;color:var(--dim);font-size:.76rem}
+.hero-stats{display:grid;gap:14px;align-content:center}
+.hero-stats .stat{padding:26px 26px 24px}
+.hero-stats .stat strong{font-size:clamp(2rem,3.4vw,2.8rem)}
+.hero-stats .stat-note{margin-top:2px}
+
+
+.who-mark {
+    width: 80px;
+    height: 80px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 1px solid rgba(216,193,142,.4);
+    background: #0a0907;
+}
+
+.profile-photo {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center 35%;
+    border-radius: 50%;
+}
+/* Sections */
+.section{position:relative;padding:clamp(80px,10vw,128px) 0;border-top:1px solid var(--line)}
+.section::before{content:"";position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(216,193,142,.6),transparent);transform:scaleX(1);transition:transform 1.8s var(--ease) .15s;pointer-events:none}
+.js .section:not(.in)::before{transform:scaleX(0)}
+.section-head{max-width:760px;margin-bottom:clamp(36px,5vw,56px)}
+
+/* About */
+.about{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(36px,6vw,80px);align-items:start}
+.statement{font-size:clamp(1.4rem,2.4vw,1.85rem);font-weight:500;line-height:1.35;letter-spacing:-.03em}
+.about-body p{margin-bottom:16px;color:var(--muted)}
+.about-body p:last-child{margin-bottom:0}
+.about-body strong{color:var(--ink);font-weight:600}
+
+
+/* Projects: grouped by type; the lead project of each group spans the full row */
+.project-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.project-grid>.featured{grid-column:1 / -1}
+.project{display:flex;flex-direction:column;padding:clamp(24px,3vw,32px);border-radius:var(--r-xl)}
+.project-top{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.project-top::after{content:"";order:1;flex:1;height:1px;background:linear-gradient(90deg,rgba(216,193,142,.5),rgba(216,193,142,.06))}
+.project-type{order:0;color:var(--gold);font-size:.68rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.project-num{order:2;color:var(--dim);font-size:.75rem;font-weight:500;font-variant-numeric:tabular-nums}
+.project h3{margin-bottom:12px;font-size:clamp(1.25rem,2vw,1.55rem);font-weight:700;letter-spacing:-.03em;line-height:1.22}
+.project-summary{margin-bottom:18px;color:var(--muted);font-size:.9rem;line-height:1.65}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:10px;margin:0 0 18px;padding:0;list-style:none}
+.metrics li{padding:13px 15px;border:1px solid rgba(216,193,142,.16);border-radius:var(--r-md);background:rgba(216,193,142,.05)}
+.metrics strong{display:block;color:var(--gold-2);font-size:1.12rem;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.metrics span{display:block;margin-top:3px;color:var(--dim);font-size:.74rem;line-height:1.45}
+.project-note{margin:0 0 18px;color:var(--dim);font-size:.8rem;line-height:1.6}
+details.note{margin-bottom:16px;color:var(--muted);font-size:.84rem}
+details.note summary{display:inline-flex;align-items:center;gap:8px;list-style:none;cursor:pointer;padding:6px 14px;border:1px solid rgba(216,193,142,.28);border-radius:999px;background:rgba(216,193,142,.08);color:var(--gold);font-size:.8rem;font-weight:600;transition:background .3s}
+details.note summary::-webkit-details-marker{display:none}
+details.note summary::after{content:"+";font-size:1rem;line-height:1;transition:transform .35s var(--ease)}
+details.note summary:hover{background:rgba(216,193,142,.14)}
+details.note[open] summary::after{transform:rotate(45deg)}
+details.note p{margin-top:12px;padding:14px 16px;border:1px solid rgba(255,255,255,.08);border-left:2px solid var(--gold);border-radius:var(--r-md);background:rgba(255,255,255,.035);line-height:1.65}
+details.note[open] p{animation:fadeDown .4s var(--ease)}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:auto 0 18px}
+.tag{padding:5px 11px;border:1px solid rgba(255,255,255,.1);border-radius:999px;background:rgba(255,255,255,.07);color:#d9d2c4;font-size:.72rem;font-weight:500}
+.project-links{display:flex;flex-wrap:wrap;gap:10px 22px;padding-top:16px;border-top:1px solid var(--line)}
+.text-link{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:.84rem;font-weight:600;transition:color .25s}
+.text-link:hover{color:var(--gold-2)}
+
+/* Skills */
+.skills{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.skill{padding:24px}
+.skill h3{margin-bottom:16px;font-size:.98rem;font-weight:600;letter-spacing:-.01em}
+.skill-list{display:flex;flex-wrap:wrap;gap:7px}
+.skill-list span{padding:6px 12px;border:1px solid rgba(216,193,142,.2);border-radius:999px;background:rgba(216,193,142,.08);color:#ebe4d6;font-size:.76rem;font-weight:500}
+
+/* Education */
+.journey{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.journey-card{padding:clamp(24px,3vw,32px);border-radius:var(--r-xl)}
+.journey-card h3{margin-bottom:22px;font-size:1.05rem;font-weight:600}
+.journey-card>p{margin-bottom:22px;color:var(--muted);font-size:.9rem}
+.timeline{position:relative;display:grid;gap:22px;padding-left:24px}
+.timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1px;background:linear-gradient(var(--gold),rgba(216,193,142,.08))}
+.tl-item{position:relative}
+.tl-item::before{content:"";position:absolute;left:-24px;top:6px;width:11px;height:11px;border:1px solid var(--gold);border-radius:50%;background:#0a0a0a}
+.tl-year{margin-bottom:4px;color:var(--gold);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.tl-item h4{margin-bottom:3px;font-size:.94rem;font-weight:600}
+.tl-item p{color:var(--muted);font-size:.83rem;line-height:1.55}
+.cert-label{margin-bottom:10px;color:var(--dim);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.certs{display:grid;gap:8px}
+.cert{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;border:1px solid rgba(255,255,255,.1);border-radius:var(--r-md);background:rgba(255,255,255,.04);color:#e8e1d3;font-size:.86rem;font-weight:500;transition:border-color .3s,background .3s,color .3s}
+.cert:hover{border-color:rgba(216,193,142,.36);background:rgba(216,193,142,.07);color:var(--gold)}
+.cert svg{width:15px;height:15px;flex:none;opacity:.6;transition:transform .3s var(--ease),opacity .3s}
+.cert:hover svg{transform:translate(2px,-2px);opacity:1}
+
+/* Contact */
+.contact{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:center;padding:clamp(32px,5vw,56px);border-radius:var(--r-xl);background:radial-gradient(600px circle at 100% 0%,rgba(216,193,142,.14),transparent 60%),var(--glass)}
+.contact p{max-width:60ch;color:var(--muted)}
+.contact-actions{display:grid;gap:10px;min-width:220px}
+.contact-actions .btn{justify-content:space-between}
+.contact-extra{grid-column:1 / -1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px 32px;padding-top:28px;border-top:1px solid var(--line)}
+.contact-location{display:grid;gap:6px}
+.contact-label{color:var(--dim);font-size:.66rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.contact-location strong{color:var(--ink);font-size:.95rem;font-weight:500}
+.contact-chips{display:flex;flex-wrap:wrap;gap:8px}
+.contact-chips a{display:inline-flex;align-items:center;gap:6px;padding:9px 15px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.04);color:#e8e1d3;font-size:.82rem;font-weight:500;transition:border-color .3s,background .3s,color .3s}
+.contact-chips a:hover{border-color:rgba(216,193,142,.36);background:rgba(216,193,142,.07);color:var(--gold)}
+.contact-chips a span{font-size:.75rem;opacity:.6}
+
+/* Footer */
+.footer{padding:28px 0;border-top:1px solid var(--line);color:var(--dim);font-size:.8rem}
+.footer .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.footer-links{display:flex;flex-wrap:wrap;gap:20px}
+.footer-links a{transition:color .25s}
+.footer-links a:hover{color:var(--gold)}
+.footer-contact{width:100%;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 28px;padding-bottom:20px;margin-bottom:2px;border-bottom:1px solid var(--line)}
+.footer-contact .footer-links{color:var(--muted)}
+.footer-contact .footer-links a{color:var(--muted)}
+.footer-contact .footer-links a:hover{color:var(--gold)}
+
+/* Responsive */
+@media (max-width:1000px){
+  .hero-grid,.about{grid-template-columns:1fr}
+  .skills{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  .project-grid,.journey,.contact{grid-template-columns:1fr}
+  .contact-actions{min-width:0}
+}
+@media (max-width:560px){
+  .wrap{width:calc(100% - 36px)}
+  .eyebrow{border-radius:22px;row-gap:6px}
+  .eyebrow .sep{display:none}
+  .stats{grid-template-columns:1fr}
+  .stat{display:flex;align-items:baseline;gap:14px}
+  .stat strong{min-width:96px}
+  .stat span{margin-top:0}
+  .skills{grid-template-columns:1fr}
+  .footer .wrap{flex-direction:column;align-items:flex-start}
+}
+@media(max-width:1080px){
+  .nav-shell{min-height:67px;flex-wrap:wrap;padding:9px 12px 9px 15px}
+  .nav-toggle{display:grid}
+  .nav-links{border:0;border-radius:22px}
+  .js .nav-links{display:none;width:100%;padding:5px 0 15px;flex-direction:column;align-items:stretch;gap:2px}
+  .js .nav-links.is-open{display:flex;animation:menu-reveal .22s ease both}
+  .js .nav-links a{padding:10px 12px;border-radius:999px}
+  .js .nav-links .nav-contact{text-align:center;margin-top:5px}
+  .nav-shell.menu-open{border-radius:25px}
+  .nav-shell.menu-open .nav-links{margin-top:5px;padding-top:11px;border-top:1px solid rgba(246,229,198,.12)}
+}
+@media (max-width:639px){.hero-copy,.about,.about-body p{text-align:left!important}}
+@media(max-width:720px){.nav-shell{width:calc(100% - 36px)}}
+@media(max-width:520px){
+  .nav-shell{width:calc(100% - 32px)}
+  .brand-mark{width:38px;height:38px}
+  .brand-copy strong{font-size:.82rem}
+}
+@media(max-width:380px){
+  .nav-shell{gap:10px;padding:8px 10px}
+  .brand{gap:9px;min-width:0}
+  .brand-mark{width:34px;height:34px}
+  .brand-copy strong{font-size:.76rem}
+  .brand-copy span{font-size:.64rem}
+  .nav-toggle{flex:0 0 38px;width:38px;height:38px}
+}
+
+/* Extra motion */
+@keyframes slideIn{from{opacity:0;transform:translate3d(-18px,0,0)}to{opacity:1;transform:none}}
+@keyframes chipIn{from{opacity:0;transform:translate3d(0,8px,0) scale(.92)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.5)}to{opacity:1;transform:none}}
+.kicker::before{content:"";display:inline-block;width:0;height:1px;margin-right:0;background:var(--gold);transition:width .9s var(--ease) .25s,margin-right .9s var(--ease) .25s}
+.reveal.in .kicker::before{width:28px;margin-right:12px}
+.timeline::before{transform-origin:top;transition:transform 1.4s var(--ease) .3s}
+.js .journey-card:not(.in) .timeline::before{transform:scaleY(0)}
+.timeline .tl-item.reveal.in{animation:slideIn .8s var(--ease) backwards;animation-delay:var(--d,0ms)}
+.certs .cert.reveal.in{animation:slideIn .8s var(--ease) backwards;animation-delay:var(--d,0ms)}
+.contact.in .contact-actions .btn{animation:rise .7s var(--ease) backwards}
+.skill.in .skill-list span{animation:chipIn .55s var(--ease) backwards}
+.skill.in .skill-list span:nth-child(1){animation-delay:150ms}
+.contact.in .contact-actions .btn:nth-child(1){animation-delay:150ms}
+.skill.in .skill-list span:nth-child(2){animation-delay:195ms}
+.contact.in .contact-actions .btn:nth-child(2){animation-delay:240ms}
+.skill.in .skill-list span:nth-child(3){animation-delay:240ms}
+.contact.in .contact-actions .btn:nth-child(3){animation-delay:330ms}
+.skill.in .skill-list span:nth-child(4){animation-delay:285ms}
+.contact.in .contact-actions .btn:nth-child(4){animation-delay:420ms}
+.skill.in .skill-list span:nth-child(5){animation-delay:330ms}
+.contact.in .contact-actions .btn:nth-child(5){animation-delay:510ms}
+.skill.in .skill-list span:nth-child(6){animation-delay:375ms}
+.contact.in .contact-actions .btn:nth-child(6){animation-delay:600ms}
+.skill.in .skill-list span:nth-child(7){animation-delay:420ms}
+.contact.in .contact-actions .btn:nth-child(7){animation-delay:690ms}
+.skill.in .skill-list span:nth-child(8){animation-delay:465ms}
+.contact.in .contact-actions .btn:nth-child(8){animation-delay:780ms}
+.text-link{background:linear-gradient(currentColor,currentColor) no-repeat 0 100%/0 1px;transition:color .25s,background-size .45s var(--ease)}
+.text-link:hover{background-size:100% 1px}
+.btn-primary{position:relative;overflow:hidden}
+.btn-primary::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.5) 50%,transparent 65%);transform:translateX(-120%)}
+.btn-primary:hover::after{transform:translateX(120%);transition:transform .9s var(--ease)}
+
+.skill::after,.project::after,.journey-card::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(216,193,142,.7),transparent);transform:scaleX(0);transition:transform .7s var(--ease);pointer-events:none}
+.skill:hover::after,.project:hover::after,.journey-card:hover::after{transform:scaleX(1)}
+/* Keep the particle network lightweight on phones */
+@media (max-width:820px){.network-bg{opacity:.7}}
+/* Respect reduced motion: show everything at once, no movement */
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .hero::before,.pulse::after{animation:none!important}
+}
+/* Refinements: typography, header blend, and smoother motion */
+h1,h2,h3{text-wrap:balance}
+p{text-wrap:pretty}
+.about-body p{line-height:1.8}
+@media (min-width:640px){
+  .lead,.about-body p,.contact p,.journey-card>p,details.note p{text-align:left}
+}
+.nav-shell{animation:navIn .9s var(--ease) both;transition:background .4s var(--ease),border-color .4s var(--ease),box-shadow .4s var(--ease)}
+.site-header.is-scrolled .nav-shell{background:rgba(6,6,5,.95);border-color:rgba(216,193,142,.26);box-shadow:0 18px 46px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06)}
+.brand-mark{transition:box-shadow .4s var(--ease)}
+.brand:hover .brand-mark{box-shadow:0 0 0 4px rgba(216,193,142,.14)}
+.nav-pill{position:absolute;top:5px;bottom:5px;left:0;width:0;border:1px solid rgba(216,193,142,.24);border-radius:999px;background:linear-gradient(135deg,rgba(243,220,174,.17),rgba(216,193,142,.06));opacity:0;pointer-events:none;z-index:0;will-change:transform,width;transition:transform .38s var(--ease),width .38s var(--ease),opacity .25s ease}
+@keyframes navIn{from{opacity:0;transform:translate3d(0,-14px,0)}to{opacity:1;transform:none}}
+@media (min-width:861px){
+  .nav-links a:not(.nav-contact):hover,.nav-links a[aria-current="location"]:not(.nav-contact){background:transparent}
+}
+@media (min-width:861px) and (max-width:1040px){
+  .nav-links a{padding:8px 10px}
+  .nav-links .nav-contact{padding:9px 14px}
+}
+@media (max-width:1080px){
+  .nav-pill{display:none}
+  .js .nav-links.is-open a{animation:chipIn .5s var(--ease) backwards}
+  .js .nav-links.is-open a:nth-child(3){animation-delay:45ms}
+  .js .nav-links.is-open a:nth-child(4){animation-delay:90ms}
+  .js .nav-links.is-open a:nth-child(5){animation-delay:135ms}
+  .js .nav-links.is-open a:nth-child(6){animation-delay:180ms}
+  .js .nav-links.is-open a:nth-child(7){animation-delay:225ms}
+}
+
+@media (max-width:1000px){.hero-stats{grid-template-columns:repeat(3,minmax(0,1fr))}.hero-stats .stat-note{grid-column:1 / -1}}
+@media (max-width:560px){.hero-stats{grid-template-columns:1fr}}
+/* Meri Additional Class*/
+
+.nx01{
+  text-align: justify;
+}
+
+
+
+/* ===== Customer Purchase page additions (same tokens and motion as index) ===== */
+:root{--ring:#11100d}
+.nav-links a.nav-back{color:var(--gold)}
+.nav-links a.nav-back:hover{color:#fff5df}
+.brand-mark{position:relative;display:grid;place-items:center;overflow:hidden;color:var(--gold);font-size:.74rem;font-weight:700;border:1px solid rgba(216,193,142,.3)}
+.brand-mark .brand-avatar{position:absolute;inset:0;width:100%;height:100%}
+.hero-links{margin-top:22px;color:var(--dim);font-size:.84rem}
+
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.two>*,.grid4>*,.grid3>*,.hist-grid>*{min-width:0}
+.hist-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+
+.sub-title{margin:72px 0 10px;font-size:clamp(1.3rem,2.2vw,1.65rem);font-weight:650;letter-spacing:-.03em;line-height:1.2}
+.sub-lead{margin-bottom:24px;color:var(--muted);font-size:.95rem;max-width:72ch}
+.section-head+.two,.section-head+.grid4{margin-top:0}
+
+.fact{padding:clamp(22px,2.6vw,28px)}
+.fact h3{margin-bottom:10px;font-size:1rem;font-weight:600;letter-spacing:-.01em}
+.fact p{color:var(--muted);font-size:.9rem;line-height:1.65}
+.fact .fine{margin-top:12px;color:var(--dim);font-size:.8rem;line-height:1.55}
+.fact .btn{margin-top:18px}
+
+.chart-card{padding:clamp(22px,3vw,30px)}
+.chart-card h3{margin-bottom:4px;font-size:1.02rem;font-weight:650;letter-spacing:-.01em}
+.chart-card .csub{margin-bottom:22px;color:var(--dim);font-size:.85rem;line-height:1.55}
+.chart-card .fine{margin-top:16px;color:var(--dim);font-size:.8rem;line-height:1.55}
+.split{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:clamp(22px,4vw,40px);align-items:center}
+.split-side .fine{margin-top:16px;color:var(--dim);font-size:.82rem;line-height:1.6}
+
+.kv{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:11px 16px;margin:0;font-size:.9rem}
+.kv dt{color:var(--dim)}
+.kv dd{margin:0;color:var(--muted)}
+.kv dd b{color:var(--ink);font-weight:600}
+
+/* vertical bar chart: bars scale on the compositor (transform only) */
+.vchart{margin-top:4px}
+.vplot{position:relative;display:flex;gap:6px;height:240px;padding-top:26px;border-bottom:1px solid var(--line);background:linear-gradient(to top,rgba(255,255,255,.07) 1px,transparent 1px) 0 0/100% 25% repeat-y}
+.vcol{position:relative;flex:1 1 0;min-width:0;--s:0}
+.vbar{position:absolute;left:12%;right:12%;top:0;bottom:0;transform-origin:50% 100%;transform:scaleY(var(--s));border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,#f3dcae 0%,#d8c18e 55%,#a8854a 100%);transition:transform .95s var(--ease) calc(var(--i,0) * 55ms)}
+.vval{position:absolute;left:-18%;right:-18%;bottom:calc(var(--s) * 100% + 6px);text-align:center;color:var(--muted);font-size:.72rem;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums;transition:opacity .6s ease calc(var(--i,0) * 55ms + .35s)}
+.vcol.is-hi .vbar{background:linear-gradient(180deg,#b9f2d6,#4fd39a 60%,#2f9d70)}
+.vcol.is-hi .vval{color:#9ff0c9}
+.vlabels{display:flex;gap:6px;margin-top:10px}
+.vlab{flex:1 1 0;min-width:0;text-align:center;color:var(--dim);font-size:.74rem;line-height:1.3}
+.vlab small{display:block;color:var(--gold);font-size:.64rem;letter-spacing:.06em;text-transform:uppercase}
+.vchart.no-vals .vval{display:none}
+
+/* horizontal bars */
+.hchart{display:grid;gap:12px}
+.hrow{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) minmax(0,140px);gap:12px;align-items:center;font-size:.88rem}
+.hlab{grid-column:1;grid-row:1;color:var(--muted)}
+.hval{grid-column:3;grid-row:1;text-align:right;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.htrack{grid-column:2;grid-row:1;height:22px;border-radius:7px;background:var(--s2);overflow:hidden}
+.hbar{display:block;height:100%;width:100%;border-radius:7px;transform-origin:0 50%;transform:scaleX(var(--s));background:linear-gradient(90deg,#a8854a,#d8c18e);transition:transform .95s var(--ease) calc(var(--i,0) * 45ms)}
+.hbar.is-hi{background:linear-gradient(90deg,#d8c18e,#f7e9c8)}
+.hbar.is-ph{background:linear-gradient(90deg,#c97f69,#f0a28c)}
+@media (max-width:560px){
+  .hrow{grid-template-columns:minmax(0,1fr) auto}
+  .hlab{grid-column:1;grid-row:1}
+  .hval{grid-column:2;grid-row:1}
+  .htrack{grid-column:1 / -1;grid-row:2}
+}
+
+/* donut: a conic gradient, animated with transform and opacity only */
+.donut-wrap{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:28px;align-items:center}
+.donut{position:relative;width:100%;max-width:220px;aspect-ratio:1/1;border-radius:50%;transition:transform 1.1s var(--ease),opacity .9s ease}
+.donut::after{content:"";position:absolute;inset:23%;border-radius:50%;background:var(--ring);z-index:0}
+.donut-c{position:absolute;inset:0;z-index:1;display:grid;place-content:center;text-align:center}
+.donut-c strong{font-size:1.3rem;font-weight:700;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.donut-c span{color:var(--dim);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase}
+.legend{list-style:none;margin:0;padding:0;display:grid;gap:11px;font-size:.88rem}
+.legend li{display:grid;grid-template-columns:12px minmax(0,1fr) auto auto;gap:10px;align-items:center}
+.legend i{width:12px;height:12px;border-radius:4px}
+.legend span{color:var(--muted)}
+.legend b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.legend em{min-width:54px;color:var(--dim);font-style:normal;text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:820px){.donut-wrap{grid-template-columns:1fr;justify-items:center}.legend{width:100%}}
+
+/* segmented toggle (cluster view) */
+.seg{display:inline-flex;gap:4px;margin-bottom:22px;padding:4px;border:1px solid var(--line-glass);border-radius:999px;background:rgba(255,255,255,.03)}
+.seg button{padding:8px 15px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:.82rem;cursor:pointer;transition:background .25s,color .25s}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#17130b;font-weight:600}
+
+/* tables */
+.tbl{overflow-x:auto;margin-top:18px;border:1px solid var(--line-glass);border-radius:var(--r-lg);background:var(--glass);-webkit-overflow-scrolling:touch}
+.tbl table{width:100%;min-width:640px;border-collapse:collapse;font-size:.88rem}
+.tbl th,.tbl td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl th{background:rgba(216,193,142,.06);color:var(--gold);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.tbl td{color:var(--muted);line-height:1.55}
+.tbl td strong{color:var(--ink);font-weight:600}
+.tbl .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.chk{color:#8fe3b7;font-size:.8rem;white-space:nowrap}
+details.note .tbl{margin-top:14px}
+
+/* priority tags */
+.pri{display:inline-block;padding:4px 10px;border-radius:999px;font-size:.7rem;font-weight:600;letter-spacing:.03em;white-space:nowrap}
+.pri-req{color:#ffc9bb;background:rgba(240,162,140,.12);border:1px solid rgba(240,162,140,.3)}
+.pri-high{color:var(--gold-2);background:rgba(216,193,142,.1);border:1px solid rgba(216,193,142,.3)}
+.pri-med{color:var(--muted);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+
+/* callouts */
+.callout{margin-top:26px;padding:20px 24px;border:1px solid rgba(216,193,142,.22);border-left:3px solid var(--gold);border-radius:var(--r-md);background:rgba(216,193,142,.045);color:var(--muted);font-size:.93rem;line-height:1.7}
+.callout b{color:var(--gold-2);font-weight:600}
+.callout.warn{border-color:rgba(216,193,142,.24);border-left-color:var(--gold);background:rgba(216,193,142,.055)}
+.callout.warn b{color:var(--gold-2)}
+
+.foot-note{margin-top:14px;color:var(--dim);font-size:.8rem;line-height:1.6}
+/* saved screenshots */
+.shots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.shot{margin:0;padding:12px;border:1px solid var(--line-glass);border-radius:var(--r-lg);background:var(--glass);box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+.shot img{display:block;width:100%;height:auto;aspect-ratio:1400/875;object-fit:cover;border-radius:14px;background:#0a0a0a}
+.shot figcaption{padding:12px 6px 4px;color:var(--muted);font-size:.88rem;line-height:1.5}
+.shot figcaption b{display:block;margin-bottom:2px;color:var(--ink);font-weight:600}
+
+/* about block */
+.who{display:flex;align-items:center;gap:16px;margin-bottom:22px}
+.who-mark{display:grid;place-items:center;flex:none;width:64px;height:64px;border-radius:50%;border:1px solid rgba(216,193,142,.35);background:var(--glass);color:var(--gold);font-weight:700}
+.who h2{margin:0 0 4px;font-size:clamp(1.3rem,2.4vw,1.7rem);font-weight:650;letter-spacing:-.03em;line-height:1.15}
+.role{color:var(--gold);font-size:.9rem;font-weight:600}
+.about-copy p{color:var(--muted);margin-bottom:14px}
+.about-copy .kv{margin-top:22px}
+.dl-card{padding:clamp(24px,3vw,32px);border-radius:var(--r-xl)}
+.dl-card h3{margin-bottom:10px;font-size:1.05rem;font-weight:600}
+.dl-card p{color:var(--muted);font-size:.9rem;line-height:1.65}
+.dl-card .meta{margin-top:12px;color:var(--dim);font-size:.8rem}
+
+/* contact */
+.contact-location span{display:block;color:var(--muted);font-size:.9rem;margin-top:4px;word-break:break-word}
+
+/* chat assistant (kept from the original page, restyled) */
+.chat-fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;display:flex;align-items:center;gap:9px;min-height:50px;padding:0 20px;border:0;border-radius:999px;background:linear-gradient(135deg,#f3dcae,#d8a452);color:#21180b;font:600 .88rem/1 Inter,ui-sans-serif,system-ui,sans-serif;cursor:pointer;box-shadow:0 14px 34px -14px rgba(0,0,0,.85);transition:transform .25s var(--ease),background .25s}
+.chat-fab:hover{transform:translateY(-2px);background:#f8e5bd}
+.chat{position:fixed;right:18px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:70;display:none;flex-direction:column;width:min(380px,calc(100vw - 36px));height:min(560px,calc(100dvh - 160px));overflow:hidden;border:1px solid rgba(216,193,142,.22);border-radius:22px;background:#0d0c0a;box-shadow:0 30px 60px -28px rgba(0,0,0,.92)}
+.chat.open{display:flex;animation:chatIn .26s var(--ease)}
+@keyframes chatIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.chat-h{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line)}
+.chat-h strong{display:block;font-size:.95rem;font-weight:600}
+.chat-h small{color:var(--dim);font-size:.74rem}
+.x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.06);color:var(--muted);font-size:1.2rem;line-height:1;cursor:pointer}
+.chat-log{display:flex;flex:1;flex-direction:column;gap:10px;overflow-y:auto;overscroll-behavior:contain;padding:16px}
+.msg{max-width:86%;padding:10px 14px;border-radius:16px;font-size:.88rem;line-height:1.55;animation:chatIn .22s var(--ease)}
+.msg.bot{align-self:flex-start;border-bottom-left-radius:5px;background:rgba(255,255,255,.06);color:#e8e1d3}
+.msg.me{align-self:flex-end;border-bottom-right-radius:5px;background:var(--gold);color:#17130b}
+.typing{display:flex;gap:4px;align-self:flex-start;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.06)}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--dim);animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.chips button{padding:6px 11px;border:1px solid var(--line-glass);border-radius:999px;background:transparent;color:var(--muted);font-size:.78rem;cursor:pointer;transition:border-color .2s,color .2s}
+.chips button:hover{border-color:rgba(216,193,142,.4);color:var(--gold)}
+.wa-link{display:block;margin:0 12px 10px;padding:10px;border:1px solid rgba(216,193,142,.35);border-radius:999px;color:var(--gold-2);font-size:.82rem;font-weight:600;text-align:center}
+.chat form{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.chat input{flex:1;min-width:0;min-height:44px;padding:0 15px;border:1px solid var(--line-glass);border-radius:999px;background:#070706;color:var(--ink);font:16px Inter,system-ui,sans-serif}
+.chat input:focus{outline:none;border-color:rgba(216,193,142,.45)}
+.chat form button{min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--gold);color:#17130b;font-weight:600;cursor:pointer}
+
+/* grid items must be allowed to shrink below their label content on small screens */
+.split>*,.donut-wrap>*,.chart-card>*{min-width:0}
+/* responsive */
+@media (max-width:1000px){.hist-grid{grid-template-columns:1fr}}
+@media (max-width:820px){.two,.split{grid-template-columns:1fr}.hist-grid{grid-template-columns:1fr}}
+@media (max-width:760px){.shots{grid-template-columns:1fr}}
+@media (max-width:560px){
+  .kv{grid-template-columns:1fr;gap:3px}
+  .kv dd{margin-bottom:10px}
+  .vplot{height:200px}
+  .chart-card{padding:20px}
+  .fact{padding:22px}
+  .chat-fab{right:14px}.chat{right:14px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><canvas class="network-bg" id="ambient-network"></canvas></div>
+<a class="skip" href="#overview">Skip to content</a>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="site-header">
+  <div class="wrap nav-shell">
+    <a class="brand" href="#overview" aria-label="Nikhil Kumar Vishwakrma, back to top">
+      <span class="brand-mark" aria-hidden="true">NV<img class="brand-avatar" src="../../../../main-images/image.jpg" alt="" width="48" height="48" fetchpriority="high" onerror="this.style.display='none'"></span>
+      <span class="brand-copy"><strong>Nikhil Kumar Vishwakrma</strong><span>Data Analyst · MIS Analyst</span></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="primary-nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+    <nav class="nav-links" id="primary-nav" aria-label="Sections"><span class="nav-pill" aria-hidden="true"></span><a class="nav-back" href="../../../../index.html#work">← Portfolio</a><a href="#findings">Findings</a><a href="#pipeline">Pipeline</a><a href="#segments">Segments</a><a href="#model">Model</a><a href="#limits">Limits</a><a href="#about">About</a><a class="nav-contact" href="#contact">Contact</a></nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="overview">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow enter" style="--d:0ms"><span class="pulse" aria-hidden="true"></span><span>Customer Purchase Behavior Report</span></p>
+      <h1 class="display"><span class="hero-intro">Case study</span><span class="line"><span>Customer Purchase</span></span><span class="line"><span class="accent">Behavior Analyzer</span></span></h1>
+      <p class="hero-copy enter" style="--d:200ms">A Python and Streamlit project that turns 302,006 purchase records into sales views, customer segments and a spending estimate. Its data-quality problems stay visible throughout, because they change what the numbers can honestly say.</p>
+      <div class="actions enter" style="--d:300ms">
+        <a class="btn btn-primary" href="cpba-screens/NXDAXCPBA01_Customer_Purchase_Behavior_Analysis_Project_Report_V01_14Nov26.pdf" download>Download project report (PDF) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg></a>
+        <a class="btn btn-ghost" href="#findings">Explore the findings <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+        <button class="btn btn-ghost" type="button" data-open-chat>Ask about the project</button>
+      </div>
+      <p class="hero-meta enter" style="--d:400ms"><strong>BCA in Data Science &amp; AI</strong> &nbsp;·&nbsp; <a class="text-link" href="../../../../index.html#work">← Back to portfolio</a></p>
+    </div>
+    <aside class="hero-stats" aria-label="Key figures">
+      <div class="card stat reveal" style="--d:0ms"><strong data-count="302006">302,006</strong><span>rows analysed after removing 4 duplicates</span></div>
+      <div class="card stat reveal" style="--d:120ms"><strong data-count="412.9" data-dec="1" data-prefix="₹" data-suffix="M">₹412.9M</strong><span>total of Total_Amount across those rows</span></div>
+      <div class="card stat reveal" style="--d:240ms"><strong data-count="5">5</strong><span>RFM clusters from K-Means, one of them a placeholder</span></div>
+      <div class="card stat reveal" style="--d:360ms"><strong data-count="656.45" data-dec="2" data-prefix="₹">₹656.45</strong><span>Random Forest mean absolute error (MAE)</span></div>
+      <p class="stat-note">Figures are the notebook’s saved outputs, cross-checked against the notebook, the dashboard and the segmentation screenshots.</p>
+    </aside>
+  </div>
+  <div class="wrap">
+    <div class="callout warn enter" style="--d:420ms"><b>Read this first.</b> Missing customer IDs were filled with zero, so 308 unrelated transactions were merged into one fake customer worth ₹445,374.40. Leave that group out of any segment or customer-value conclusion.</div>
+  </div>
+</section>
+
+<section class="section watch" id="findings">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Findings</span>
+      <h2 class="h2">Sales look healthy at scale. The customer view needs a fix first.</h2>
+      <p class="lead">These are the recorded results from the notebook’s saved outputs. They have not been recalculated, because the source CSV files are not included in the project archive.</p>
+    </div>
+    <div class="grid4">
+      <article class="card fact reveal" style="--d:0ms"><h3>Scale</h3><p>After four exact duplicate rows were removed, the analysis covers 302,006 rows and ₹412,922,905.96 in Total_Amount.</p></article>
+      <article class="card fact reveal" style="--d:90ms"><h3>Typical row</h3><p>The mean Total_Amount per row is ₹1,367.27. It is a row-level average, not revenue per unique order or per verified customer.</p></article>
+      <article class="card fact reveal" style="--d:180ms"><h3>Ratings</h3><p>The average rating is 3.16 out of 5. It is one overall figure, so differences between categories cannot be seen in it.</p></article>
+      <article class="card fact reveal" style="--d:270ms"><h3>Leaders in the app</h3><p>Business Insights names Electronics as the top category, Pepsi as the top brand and the USA as the top country by spend. Recheck these once the data is restored.</p>
+        <p class="fine">Electronics and Pepsi match the notebook’s chart values. The USA claim appears only in a saved app screenshot, because the notebook has no country breakdown.</p></article>
+    </div>
+
+    <div class="tbl reveal">
+      <table>
+        <thead><tr><th>Measure</th><th class="n">Recorded value</th><th>What it means</th><th>Cross-check</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Source rows</strong></td><td class="n">302,010</td><td>30 fields, including direct contact details</td><td><span class="chk">✓ Matches saved output</span></td></tr>
+          <tr><td><strong>Exact duplicates removed</strong></td><td class="n">4</td><td>Leaves 302,006 analysis rows</td><td><span class="chk">✓ Matches saved output</span></td></tr>
+          <tr><td><strong>Sum of Total_Amount</strong></td><td class="n">₹412,922,905.96</td><td>The project’s transaction amount field</td><td><span class="chk">✓ Category, segment, gender and month splits each add to it</span></td></tr>
+          <tr><td><strong>Mean Total_Amount per row</strong></td><td class="n">₹1,367.27</td><td>Row-level average across all rows</td><td><span class="chk">✓ Sum divided by 302,006</span></td></tr>
+          <tr><td><strong>Distinct Transaction_ID</strong></td><td class="n">294,462</td><td>Counted after missing IDs were set to zero</td><td><span class="chk">✓ Matches; Dashboard “Orders”</span></td></tr>
+          <tr><td><strong>Distinct Customer_ID</strong></td><td class="n">86,767</td><td>Includes the zero-filled placeholder group. Without it: 86,766 customers</td><td><span class="chk">✓ Matches; Segmentation “Total Customers”</span></td></tr>
+          <tr><td><strong>Mean rating</strong></td><td class="n">3.16 / 5</td><td>Average across the cleaned rows</td><td><span class="chk">✓ Dashboard shows 3.2, rounded</span></td></tr>
+          <tr><td><strong>Overall RFM averages</strong></td><td class="n">95.9 days · 3.48 · ₹4,758.99</td><td>Recency, frequency and monetary; includes the placeholder group</td><td><span class="chk">✓ Cluster-weighted averages reproduce them</span></td></tr>
+          <tr><td><strong>Random Forest MAE</strong></td><td class="n">₹656.45</td><td>Random 80/20 split with seed 42</td><td><span class="chk">✓ Matches; single run, not repeated</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-title reveal">Sales breakdown</h3>
+    <p class="sub-lead reveal">Values are read from the notebook’s saved charts. Each breakdown adds up to the same ₹412,922,905.96 total.</p>
+
+    <article class="card chart-card reveal">
+      <div class="split">
+        <div>
+          <h3>Monthly revenue trend</h3>
+          <p class="csub">Total_Amount by month, March 2023 to February 2024, in ₹ million.</p>
+          <div class="vchart" role="img" aria-label="Monthly revenue, March 2023 to February 2024, in ₹ million"><div class="vplot"><div class="vcol" title="Mar 2023: ₹35,296,450.43 (+2.6% vs average)" style="--i:0;--s:1.0000"><span class="vbar"></span><span class="vval">35.3</span></div><div class="vcol" title="Apr 2023: ₹34,083,074.88 (-1.0% vs average)" style="--i:1;--s:0.9656"><span class="vbar"></span><span class="vval">34.1</span></div><div class="vcol" title="May 2023: ₹34,536,619.72 (+0.4% vs average)" style="--i:2;--s:0.9785"><span class="vbar"></span><span class="vval">34.5</span></div><div class="vcol" title="Jun 2023: ₹33,805,539.84 (-1.8% vs average)" style="--i:3;--s:0.9578"><span class="vbar"></span><span class="vval">33.8</span></div><div class="vcol" title="Jul 2023: ₹34,930,025.18 (+1.5% vs average)" style="--i:4;--s:0.9896"><span class="vbar"></span><span class="vval">34.9</span></div><div class="vcol" title="Aug 2023: ₹35,239,089.57 (+2.4% vs average)" style="--i:5;--s:0.9984"><span class="vbar"></span><span class="vval">35.2</span></div><div class="vcol" title="Sep 2023: ₹33,945,761.30 (-1.3% vs average)" style="--i:6;--s:0.9617"><span class="vbar"></span><span class="vval">33.9</span></div><div class="vcol" title="Oct 2023: ₹34,635,813.96 (+0.7% vs average)" style="--i:7;--s:0.9813"><span class="vbar"></span><span class="vval">34.6</span></div><div class="vcol" title="Nov 2023: ₹33,793,143.54 (-1.8% vs average)" style="--i:8;--s:0.9574"><span class="vbar"></span><span class="vval">33.8</span></div><div class="vcol" title="Dec 2023: ₹34,720,385.28 (+0.9% vs average)" style="--i:9;--s:0.9837"><span class="vbar"></span><span class="vval">34.7</span></div><div class="vcol" title="Jan 2024: ₹34,767,605.31 (+1.0% vs average)" style="--i:10;--s:0.9850"><span class="vbar"></span><span class="vval">34.8</span></div><div class="vcol" title="Feb 2024: ₹33,169,396.95 (-3.6% vs average)" style="--i:11;--s:0.9397"><span class="vbar"></span><span class="vval">33.2</span></div></div><div class="vlabels"><span class="vlab">Mar<small>2023</small></span><span class="vlab">Apr</span><span class="vlab">May</span><span class="vlab">Jun</span><span class="vlab">Jul</span><span class="vlab">Aug</span><span class="vlab">Sep</span><span class="vlab">Oct</span><span class="vlab">Nov</span><span class="vlab">Dec</span><span class="vlab">Jan<small>2024</small></span><span class="vlab">Feb</span></div></div>
+        </div>
+        <aside class="split-side">
+          <dl class="kv">
+            <dt>Highest</dt><dd><b>Mar 2023</b> · ₹35.30M</dd>
+            <dt>Lowest</dt><dd><b>Feb 2024</b> · ₹33.17M</dd>
+            <dt>Monthly average</dt><dd>₹34.41M</dd>
+            <dt>12-month total</dt><dd>₹412.92M</dd>
+          </dl>
+          <p class="fine">The year is flat. Every month sits between 3.6% below and 2.6% above the average.</p>
+        </aside>
+      </div>
+    </article>
+
+    <div class="two">
+      <article class="card chart-card reveal">
+        <h3>Revenue by product category</h3>
+        <p class="csub">Total_Amount per category, in ₹ million. Electronics leads at 23.7% of the total.</p>
+        <div class="vchart" role="img" aria-label="Revenue by product category, in ₹ million"><div class="vplot"><div class="vcol" title="Electronics: ₹97,882,999.89 (23.70%)" style="--i:0;--s:1.0000"><span class="vbar"></span><span class="vval">97.9</span></div><div class="vcol" title="Grocery: ₹91,158,568.37 (22.08%)" style="--i:1;--s:0.9313"><span class="vbar"></span><span class="vval">91.2</span></div><div class="vcol" title="Clothing: ₹74,889,282.87 (18.14%)" style="--i:2;--s:0.7651"><span class="vbar"></span><span class="vval">74.9</span></div><div class="vcol" title="Books: ₹74,646,770.47 (18.08%)" style="--i:3;--s:0.7626"><span class="vbar"></span><span class="vval">74.6</span></div><div class="vcol" title="Home Decor: ₹74,345,284.36 (18.00%)" style="--i:4;--s:0.7595"><span class="vbar"></span><span class="vval">74.3</span></div></div><div class="vlabels"><span class="vlab">Electronics</span><span class="vlab">Grocery</span><span class="vlab">Clothing</span><span class="vlab">Books</span><span class="vlab">Home Decor</span></div></div>
+      </article>
+      <article class="card chart-card reveal" style="--d:110ms">
+        <h3>Customer segment contribution</h3>
+        <p class="csub">Share of Total_Amount by customer segment.</p>
+        <div class="donut-wrap"><div class="donut" role="img" aria-label="total split" style="background:conic-gradient(#a8854a 0.000% 48.549%, #d8c18e 48.549% 78.746%, #f1dfb4 78.746% 100.000%)"><div class="donut-c"><strong>₹412.9M</strong><span>total</span></div></div><ul class="legend"><li><i style="background:#a8854a"></i><span>Regular</span><b>₹200.47M</b><em>48.5%</em></li><li><i style="background:#d8c18e"></i><span>New</span><b>₹124.69M</b><em>30.2%</em></li><li><i style="background:#f1dfb4"></i><span>Premium</span><b>₹87.76M</b><em>21.3%</em></li></ul></div>
+      </article>
+    </div>
+
+    <div class="two">
+      <article class="card chart-card reveal">
+        <h3>Revenue by gender</h3>
+        <p class="csub">Share of Total_Amount by gender.</p>
+        <div class="hchart"><div class="hrow"><span class="hlab">Male</span><div class="htrack"><i class="hbar" style="--i:0;--s:1.0000"></i></div><b class="hval">₹256.83M · 62.2%</b></div><div class="hrow"><span class="hlab">Female</span><div class="htrack"><i class="hbar" style="--i:1;--s:0.6078"></i></div><b class="hval">₹156.09M · 37.8%</b></div></div>
+      </article>
+      <article class="card chart-card reveal" style="--d:110ms">
+        <h3>Top 10 product brands</h3>
+        <p class="csub">Total_Amount per brand, highest first.</p>
+        <div class="hchart"><div class="hrow"><span class="hlab">Pepsi</span><div class="htrack"><i class="hbar is-hi" style="--i:0;--s:1.0000"></i></div><b class="hval">₹41.78M · 10.1%</b></div><div class="hrow"><span class="hlab">Samsung</span><div class="htrack"><i class="hbar" style="--i:1;--s:0.6077"></i></div><b class="hval">₹25.39M · 6.1%</b></div><div class="hrow"><span class="hlab">Sony</span><div class="htrack"><i class="hbar" style="--i:2;--s:0.6009"></i></div><b class="hval">₹25.11M · 6.1%</b></div><div class="hrow"><span class="hlab">Coca-Cola</span><div class="htrack"><i class="hbar" style="--i:3;--s:0.5991"></i></div><b class="hval">₹25.03M · 6.1%</b></div><div class="hrow"><span class="hlab">Nike</span><div class="htrack"><i class="hbar" style="--i:4;--s:0.5989"></i></div><b class="hval">₹25.02M · 6.1%</b></div><div class="hrow"><span class="hlab">Zara</span><div class="htrack"><i class="hbar" style="--i:5;--s:0.5986"></i></div><b class="hval">₹25.01M · 6.1%</b></div><div class="hrow"><span class="hlab">Bed Bath &amp; Beyond</span><div class="htrack"><i class="hbar" style="--i:6;--s:0.5984"></i></div><b class="hval">₹25.00M · 6.1%</b></div><div class="hrow"><span class="hlab">HarperCollins</span><div class="htrack"><i class="hbar" style="--i:7;--s:0.5967"></i></div><b class="hval">₹24.93M · 6.0%</b></div><div class="hrow"><span class="hlab">Penguin Books</span><div class="htrack"><i class="hbar" style="--i:8;--s:0.5956"></i></div><b class="hval">₹24.89M · 6.0%</b></div><div class="hrow"><span class="hlab">Adidas</span><div class="htrack"><i class="hbar" style="--i:9;--s:0.5947"></i></div><b class="hval">₹24.85M · 6.0%</b></div></div>
+      </article>
+    </div>
+
+    <div class="callout warn reveal"><b>Check the brand lead before quoting it.</b> Pepsi’s total is about 1.65 times the next brand, Samsung. Brands 2 to 10 all fall between ₹24.85M and ₹25.39M. Check how the brand labels were recorded before presenting Pepsi as the lead brand.</div>
+  </div>
+</section>
+
+<section class="section watch" id="pipeline">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Pipeline</span>
+      <h2 class="h2">From a raw CSV to a Streamlit app in five steps.</h2>
+      <p class="lead">The notebook prepares the data and saves the models. The app then reads those files and presents them across six pages.</p>
+    </div>
+    <div class="flow">
+      <article class="card fact reveal" style="--d:0ms"><span class="kicker" style="margin-bottom:10px">01</span><h3>Source</h3><p>302,010 rows across 30 fields, covering transactions, customers, products, geography and ratings.</p></article>
+      <article class="card fact reveal" style="--d:90ms"><span class="kicker" style="margin-bottom:10px">02</span><h3>Clean</h3><p>Convert types, fill gaps, drop four exact duplicates and derive a year field from the date.</p></article>
+      <article class="card fact reveal" style="--d:180ms"><span class="kicker" style="margin-bottom:10px">03</span><h3>Analyze</h3><p>Group Total_Amount by month, category, gender, brand and segment, then build RFM features for each customer.</p></article>
+      <article class="card fact reveal" style="--d:270ms"><span class="kicker" style="margin-bottom:10px">04</span><h3>Model</h3><p>K-Means with five clusters (random_state 42) and a Random Forest with 100 trees for spending.</p></article>
+      <article class="card fact reveal" style="--d:360ms"><span class="kicker" style="margin-bottom:10px">05</span><h3>Explore</h3><p>Six Streamlit pages with Plotly charts, filters, segment views and prediction inputs.</p></article>
+    </div>
+
+    <div class="two">
+      <article class="card fact reveal">
+        <h3>The six app pages</h3>
+        <p>Home introduces the platform. Dashboard filters by date, country, gender and category, and summarizes amount, customers, orders and ratings. Customer Segmentation shows K-Means clusters and RFM comparisons. Predictions estimates spending from age, purchase count and rating. Business Insights ranks category, brand and country totals. About describes the project.</p>
+      </article>
+      <article class="card fact reveal" style="--d:110ms">
+        <h3>Built with</h3>
+        <p>Python, Pandas and NumPy for data work. scikit-learn for K-Means and Random Forest. Joblib for saving models, Plotly for interactive charts and Streamlit for the app. Matplotlib and Seaborn appear in the notebook.</p>
+        <p class="fine"><a class="text-link" href="#screens">See the saved app screens ↓</a></p>
+      </article>
+    </div>
+
+    <h3 class="sub-title reveal">Preparation steps</h3>
+    <div class="tbl reveal">
+      <table>
+        <thead><tr><th>Step</th><th>Implementation in the notebook</th><th>Effect and review point</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Type handling</strong></td><td>Converts the date field to datetime and selected numeric measures to numeric values.</td><td>Supports date grouping and numeric analysis.</td></tr>
+          <tr><td><strong>Missing values</strong></td><td>Fills numeric measures with medians and text fields with their modes.</td><td>Removes nulls, but mode filling can hide missingness.</td></tr>
+          <tr><td><strong>Identifiers and dates</strong></td><td>Fills missing transaction and customer IDs with 0; fills phone and postal code with 0; forward-fills dates and derives missing year values.</td><td>Zero-filled customer IDs merge unrelated records into one RFM entity.</td></tr>
+          <tr><td><strong>Duplicate control</strong></td><td>Drops exact duplicate rows; the retained run goes from 302,010 to 302,006 rows.</td><td>The resulting output is saved as a cleaned CSV.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details class="note reveal" style="margin-top:18px">
+      <summary>All 28 fields with blank values, and how each was filled</summary>
+      <p>Counts are taken after duplicate removal, from the notebook’s null-count output, before any filling. Product_Type and products had no blanks.</p>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Field</th><th class="n">Blank rows</th><th class="n">Share of 302,006</th><th>Fill rule</th></tr></thead>
+          <tbody><tr><td><strong>Transaction_ID</strong></td><td class="n">333</td><td class="n">0.11%</td><td>Set to 0</td></tr><tr><td><strong>Customer_ID</strong></td><td class="n">308</td><td class="n">0.10%</td><td>Set to 0</td></tr><tr><td><strong>Name</strong></td><td class="n">382</td><td class="n">0.13%</td><td>Most common value (mode)</td></tr><tr><td><strong>Email</strong></td><td class="n">347</td><td class="n">0.11%</td><td>Most common value (mode)</td></tr><tr><td><strong>Phone</strong></td><td class="n">362</td><td class="n">0.12%</td><td>Set to 0</td></tr><tr><td><strong>Address</strong></td><td class="n">315</td><td class="n">0.10%</td><td>Most common value (mode)</td></tr><tr><td><strong>City</strong></td><td class="n">248</td><td class="n">0.08%</td><td>Most common value (mode)</td></tr><tr><td><strong>State</strong></td><td class="n">281</td><td class="n">0.09%</td><td>Most common value (mode)</td></tr><tr><td><strong>Zipcode</strong></td><td class="n">340</td><td class="n">0.11%</td><td>Set to 0</td></tr><tr><td><strong>Country</strong></td><td class="n">271</td><td class="n">0.09%</td><td>Most common value (mode)</td></tr><tr><td><strong>Age</strong></td><td class="n">173</td><td class="n">0.06%</td><td>Column median</td></tr><tr><td><strong>Gender</strong></td><td class="n">317</td><td class="n">0.10%</td><td>Most common value (mode)</td></tr><tr><td><strong>Income</strong></td><td class="n">290</td><td class="n">0.10%</td><td>Most common value (mode)</td></tr><tr><td><strong>Customer_Segment</strong></td><td class="n">215</td><td class="n">0.07%</td><td>Most common value (mode)</td></tr><tr><td><strong>Date</strong></td><td class="n">359</td><td class="n">0.12%</td><td>Carried forward from the row above</td></tr><tr><td><strong>Year</strong></td><td class="n">350</td><td class="n">0.12%</td><td>Taken from Date</td></tr><tr><td><strong>Month</strong></td><td class="n">273</td><td class="n">0.09%</td><td>Most common value (mode)</td></tr><tr><td><strong>Time</strong></td><td class="n">350</td><td class="n">0.12%</td><td>Most common value (mode)</td></tr><tr><td><strong>Total_Purchases</strong></td><td class="n">361</td><td class="n">0.12%</td><td>Column median</td></tr><tr><td><strong>Amount</strong></td><td class="n">356</td><td class="n">0.12%</td><td>Column median</td></tr><tr><td><strong>Total_Amount</strong></td><td class="n">350</td><td class="n">0.12%</td><td>Column median</td></tr><tr><td><strong>Product_Category</strong></td><td class="n">283</td><td class="n">0.09%</td><td>Most common value (mode)</td></tr><tr><td><strong>Product_Brand</strong></td><td class="n">281</td><td class="n">0.09%</td><td>Most common value (mode)</td></tr><tr><td><strong>Feedback</strong></td><td class="n">184</td><td class="n">0.06%</td><td>Most common value (mode)</td></tr><tr><td><strong>Shipping_Method</strong></td><td class="n">337</td><td class="n">0.11%</td><td>Most common value (mode)</td></tr><tr><td><strong>Payment_Method</strong></td><td class="n">297</td><td class="n">0.10%</td><td>Most common value (mode)</td></tr><tr><td><strong>Order_Status</strong></td><td class="n">235</td><td class="n">0.08%</td><td>Most common value (mode)</td></tr><tr><td><strong>Ratings</strong></td><td class="n">184</td><td class="n">0.06%</td><td>Column median</td></tr></tbody>
+        </table>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="section watch" id="screens">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Saved app screens</span>
+      <h2 class="h2">What the Streamlit app looks like.</h2>
+      <p class="lead">Screenshots saved in the project archive. They show a saved interface state, not a fresh run: the CSV files behind the charts are missing, and some panels show a visible “undefined” label.</p>
+    </div>
+    <div class="shots"><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/Home_01.webp" alt="Home: Navigation and project overview" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Home</b>Navigation and project overview</figcaption></figure><figure class="shot reveal" style="--d:110ms"><img src="cpba-screens/Home_02.webp" alt="Home: Feature overview" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Home</b>Feature overview</figcaption></figure><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/EXD_01.webp" alt="Dashboard: Filters and headline KPIs" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Dashboard</b>Filters and headline KPIs</figcaption></figure><figure class="shot reveal" style="--d:110ms"><img src="cpba-screens/EXD_02.webp" alt="Dashboard: Monthly trend and category charts" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Dashboard</b>Monthly trend and category charts</figcaption></figure><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/CS_01.webp" alt="Customer Segmentation: Cluster filter and KPIs" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Customer Segmentation</b>Cluster filter and KPIs</figcaption></figure><figure class="shot reveal" style="--d:110ms"><img src="cpba-screens/CS_02.webp" alt="Customer Segmentation: Cluster charts" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Customer Segmentation</b>Cluster charts</figcaption></figure><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/CP_01.webp" alt="Predictions: Input sliders and the predict button" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Predictions</b>Input sliders and the predict button</figcaption></figure><figure class="shot reveal" style="--d:110ms"><img src="cpba-screens/BI_01.webp" alt="Business Insights: Product, brand and geography leaders" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Business Insights</b>Product, brand and geography leaders</figcaption></figure><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/BI_02.webp" alt="Business Insights: Customer satisfaction and recommendations" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>Business Insights</b>Customer satisfaction and recommendations</figcaption></figure><figure class="shot reveal" style="--d:110ms"><img src="cpba-screens/AB_01.webp" alt="About: Project overview and journey" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>About</b>Project overview and journey</figcaption></figure><figure class="shot reveal" style="--d:0ms"><img src="cpba-screens/AB_02.webp" alt="About: Technology stack and objectives" width="1400" height="875" loading="lazy" decoding="async"><figcaption><b>About</b>Technology stack and objectives</figcaption></figure></div>
+  </div>
+</section>
+
+<section class="section watch" id="segments">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Segments</span>
+      <h2 class="h2">Five clusters, but one of them is not a customer.</h2>
+      <p class="lead">RFM scores each customer on Recency (days since the latest purchase), Frequency (number of transactions) and Monetary (sum of Total_Amount). K-Means then groups the standardized scores into five clusters.</p>
+    </div>
+
+    <article class="card chart-card reveal">
+      <h3>Mean monetary value by cluster</h3>
+      <p class="csub">Reported averages in rupees. Switch views to compare the four real-looking clusters at a readable scale.</p>
+      <div class="seg" role="group" aria-label="Chart view">
+        <button type="button" data-mode="all" aria-pressed="true">All clusters</button>
+        <button type="button" data-mode="real" aria-pressed="false">Without placeholder</button>
+      </div>
+      <div class="hchart" id="bars"><div class="hrow"><span class="hlab">Cluster 0</span><div class="htrack"><i class="hbar" style="--i:0;--s:0.0131"></i></div><b class="hval">₹5,818.91</b></div><div class="hrow"><span class="hlab">Cluster 1</span><div class="htrack"><i class="hbar" style="--i:1;--s:0.0056"></i></div><b class="hval">₹2,499.75</b></div><div class="hrow"><span class="hlab">Cluster 2</span><div class="htrack"><i class="hbar" style="--i:2;--s:0.0231"></i></div><b class="hval">₹10,287.72</b></div><div class="hrow"><span class="hlab">Cluster 3</span><div class="htrack"><i class="hbar" style="--i:3;--s:0.0059"></i></div><b class="hval">₹2,632.41</b></div><div class="hrow"><span class="hlab">Cluster 4 (placeholder)</span><div class="htrack"><i class="hbar is-ph" style="--i:4;--s:1.0000"></i></div><b class="hval">₹445,374.40</b></div></div>
+    </article>
+
+    <div class="two">
+      <article class="card chart-card reveal">
+        <h3>Customers by cluster</h3>
+        <p class="csub">Customer counts from the notebook’s saved cluster chart. They add up to 86,767.</p>
+        <div class="donut-wrap"><div class="donut" role="img" aria-label="customers split" style="background:conic-gradient(#d8c18e 0.000% 33.878%, #a8854a 33.878% 65.026%, #f1dfb4 65.026% 79.176%, #7d6a4f 79.176% 99.999%, #f0a28c 99.999% 100.000%)"><div class="donut-c"><strong>86,767</strong><span>customers</span></div></div><ul class="legend"><li><i style="background:#d8c18e"></i><span>Cluster 0</span><b>29,395</b><em>33.9%</em></li><li><i style="background:#a8854a"></i><span>Cluster 1</span><b>27,026</b><em>31.1%</em></li><li><i style="background:#f1dfb4"></i><span>Cluster 2</span><b>12,278</b><em>14.2%</em></li><li><i style="background:#7d6a4f"></i><span>Cluster 3</span><b>18,067</b><em>20.8%</em></li><li><i style="background:#f0a28c"></i><span>Placeholder (cluster 4)</span><b>1</b><em>0.0%</em></li></ul></div>
+      </article>
+      <article class="card chart-card reveal" style="--d:110ms">
+        <h3>Choosing the number of clusters</h3>
+        <p class="csub">Inertia for k = 1 to 10, in thousands. There is no sharp elbow. The drop slows after k = 5, so five clusters is a reasonable but unproven choice.</p>
+        <div class="vchart" role="img" aria-label="Elbow method: inertia for k from 1 to 10"><div class="vplot"><div class="vcol" title="k = 1: inertia 260,301" style="--i:0;--s:1.0000"><span class="vbar"></span><span class="vval">260</span></div><div class="vcol" title="k = 2: inertia 167,892" style="--i:1;--s:0.6450"><span class="vbar"></span><span class="vval">168</span></div><div class="vcol" title="k = 3: inertia 121,776" style="--i:2;--s:0.4678"><span class="vbar"></span><span class="vval">122</span></div><div class="vcol" title="k = 4: inertia 105,856" style="--i:3;--s:0.4067"><span class="vbar"></span><span class="vval">106</span></div><div class="vcol is-hi" title="k = 5: inertia 68,921" style="--i:4;--s:0.2648"><span class="vbar"></span><span class="vval">69</span></div><div class="vcol" title="k = 6: inertia 58,416" style="--i:5;--s:0.2244"><span class="vbar"></span><span class="vval">58</span></div><div class="vcol" title="k = 7: inertia 51,960" style="--i:6;--s:0.1996"><span class="vbar"></span><span class="vval">52</span></div><div class="vcol" title="k = 8: inertia 45,910" style="--i:7;--s:0.1764"><span class="vbar"></span><span class="vval">46</span></div><div class="vcol" title="k = 9: inertia 42,420" style="--i:8;--s:0.1630"><span class="vbar"></span><span class="vval">42</span></div><div class="vcol" title="k = 10: inertia 39,427" style="--i:9;--s:0.1515"><span class="vbar"></span><span class="vval">39</span></div></div><div class="vlabels"><span class="vlab">1</span><span class="vlab">2</span><span class="vlab">3</span><span class="vlab">4</span><span class="vlab">5<small>chosen</small></span><span class="vlab">6</span><span class="vlab">7</span><span class="vlab">8</span><span class="vlab">9</span><span class="vlab">10</span></div></div>
+      </article>
+    </div>
+
+    <h3 class="sub-title reveal">How customers differ on each RFM measure</h3>
+    <div class="hist-grid">
+      <article class="card chart-card reveal">
+        <h3>Recency</h3>
+        <p class="csub">Days since the last purchase, in 30-day bins. 25.0% of customers bought within the last 30 days. Mean 95.9.</p>
+        <div class="vchart no-vals" role="img" aria-label="Customers by days since last purchase"><div class="vplot"><div class="vcol" title="0–29: 21,689 customers" style="--i:0;--s:1.0000"><span class="vbar"></span></div><div class="vcol" title="30–59: 16,320 customers" style="--i:1;--s:0.7525"><span class="vbar"></span></div><div class="vcol" title="60–89: 12,277 customers" style="--i:2;--s:0.5660"><span class="vbar"></span></div><div class="vcol" title="90–119: 9,323 customers" style="--i:3;--s:0.4298"><span class="vbar"></span></div><div class="vcol" title="120–149: 7,248 customers" style="--i:4;--s:0.3342"><span class="vbar"></span></div><div class="vcol" title="150–179: 5,469 customers" style="--i:5;--s:0.2522"><span class="vbar"></span></div><div class="vcol" title="180–209: 4,250 customers" style="--i:6;--s:0.1960"><span class="vbar"></span></div><div class="vcol" title="210–239: 3,167 customers" style="--i:7;--s:0.1460"><span class="vbar"></span></div><div class="vcol" title="240–269: 2,508 customers" style="--i:8;--s:0.1156"><span class="vbar"></span></div><div class="vcol" title="270–299: 1,825 customers" style="--i:9;--s:0.0841"><span class="vbar"></span></div><div class="vcol" title="300–329: 1,475 customers" style="--i:10;--s:0.0680"><span class="vbar"></span></div><div class="vcol" title="330–359: 1,039 customers" style="--i:11;--s:0.0479"><span class="vbar"></span></div><div class="vcol" title="360–389: 177 customers" style="--i:12;--s:0.0082"><span class="vbar"></span></div></div><div class="vlabels"><span class="vlab">0</span><span class="vlab">30</span><span class="vlab">60</span><span class="vlab">90</span><span class="vlab">120</span><span class="vlab">150</span><span class="vlab">180</span><span class="vlab">210</span><span class="vlab">240</span><span class="vlab">270</span><span class="vlab">300</span><span class="vlab">330</span><span class="vlab">360</span></div></div>
+      </article>
+      <article class="card chart-card reveal" style="--d:110ms">
+        <h3>Frequency</h3>
+        <p class="csub">Number of transactions per customer. 74.5% have between 2 and 5. Mean 3.48. The 10+ bin includes the placeholder.</p>
+        <div class="vchart no-vals" role="img" aria-label="Customers by number of transactions"><div class="vplot"><div class="vcol" title="1: 10,734 customers" style="--i:0;--s:0.5493"><span class="vbar"></span></div><div class="vcol" title="2: 17,741 customers" style="--i:1;--s:0.9078"><span class="vbar"></span></div><div class="vcol" title="3: 19,542 customers" style="--i:2;--s:1.0000"><span class="vbar"></span></div><div class="vcol" title="4: 16,287 customers" style="--i:3;--s:0.8334"><span class="vbar"></span></div><div class="vcol" title="5: 11,085 customers" style="--i:4;--s:0.5672"><span class="vbar"></span></div><div class="vcol" title="6: 6,418 customers" style="--i:5;--s:0.3284"><span class="vbar"></span></div><div class="vcol" title="7: 2,980 customers" style="--i:6;--s:0.1525"><span class="vbar"></span></div><div class="vcol" title="8: 1,240 customers" style="--i:7;--s:0.0635"><span class="vbar"></span></div><div class="vcol" title="9: 502 customers" style="--i:8;--s:0.0257"><span class="vbar"></span></div><div class="vcol" title="10+: 238 customers" style="--i:9;--s:0.0122"><span class="vbar"></span></div></div><div class="vlabels"><span class="vlab">1</span><span class="vlab">2</span><span class="vlab">3</span><span class="vlab">4</span><span class="vlab">5</span><span class="vlab">6</span><span class="vlab">7</span><span class="vlab">8</span><span class="vlab">9</span><span class="vlab">10+</span></div></div>
+      </article>
+      <article class="card chart-card reveal" style="--d:220ms">
+        <h3>Monetary</h3>
+        <p class="csub">Total spend per customer, in rupees. 60.2% fall between ₹2,000 and ₹7,500. Mean ₹4,758.99. The placeholder sits in the 50k bin.</p>
+        <div class="vchart no-vals" role="img" aria-label="Customers by total spend"><div class="vplot"><div class="vcol" title="₹&lt; 1k: 8,285 customers" style="--i:0;--s:0.4337"><span class="vbar"></span></div><div class="vcol" title="₹1k–2k: 10,179 customers" style="--i:1;--s:0.5328"><span class="vbar"></span></div><div class="vcol" title="₹2k–3k: 11,053 customers" style="--i:2;--s:0.5785"><span class="vbar"></span></div><div class="vcol" title="₹3k–4k: 11,366 customers" style="--i:3;--s:0.5949"><span class="vbar"></span></div><div class="vcol" title="₹4k–5k: 10,738 customers" style="--i:4;--s:0.5621"><span class="vbar"></span></div><div class="vcol" title="₹5k–7.5k: 19,105 customers" style="--i:5;--s:1.0000"><span class="vbar"></span></div><div class="vcol" title="₹7.5k–10k: 10,053 customers" style="--i:6;--s:0.5262"><span class="vbar"></span></div><div class="vcol" title="₹10k–20k: 5,945 customers" style="--i:7;--s:0.3112"><span class="vbar"></span></div><div class="vcol" title="₹20k–50k: 42 customers" style="--i:8;--s:0.0022"><span class="vbar"></span></div><div class="vcol" title="₹50k+: 1 customers" style="--i:9;--s:0.0001"><span class="vbar"></span></div></div><div class="vlabels"><span class="vlab">0</span><span class="vlab">1k</span><span class="vlab">2k</span><span class="vlab">3k</span><span class="vlab">4k</span><span class="vlab">5k</span><span class="vlab">7.5k</span><span class="vlab">10k</span><span class="vlab">20k</span><span class="vlab">50k</span></div></div>
+      </article>
+    </div>
+
+    <div class="tbl reveal">
+      <table>
+        <thead><tr><th>Cluster</th><th class="n">Customers</th><th class="n">Recency (days)</th><th class="n">Purchases</th><th class="n">Monetary</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td><strong>0</strong></td><td class="n">29,395</td><td class="n">61.2</td><td class="n">4.24</td><td class="n">₹5,818.91</td><td>Recent, mid-to-high value</td></tr>
+          <tr><td><strong>1</strong></td><td class="n">27,026</td><td class="n">65.9</td><td class="n">2.35</td><td class="n">₹2,499.75</td><td>Recent, lower frequency and spend</td></tr>
+          <tr><td><strong>2</strong></td><td class="n">12,278</td><td class="n">48.7</td><td class="n">6.29</td><td class="n">₹10,287.72</td><td>Most active group</td></tr>
+          <tr><td><strong>3</strong></td><td class="n">18,067</td><td class="n">229.3</td><td class="n">2.02</td><td class="n">₹2,632.41</td><td>Less recent, lower frequency</td></tr>
+          <tr><td><strong>4</strong></td><td class="n">1 (placeholder)</td><td class="n">0.0</td><td class="n">308.00</td><td class="n">₹445,374.40</td><td>Placeholder for missing IDs, not a segment</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="foot-note">Clusters 0 to 3 hold 86,766 customers. The placeholder adds one more, for 86,767 in total.</p>
+
+    <div class="callout warn reveal"><b>Why cluster 4 matters.</b> The notebook filled missing Customer_ID values with zero, so unrelated transactions share one identity. K-Means isolates that group because its frequency and spend sit far above every other cluster. Rerun segmentation with missing IDs kept empty, then recompute the profiles. Cluster numbers are arbitrary labels until then.</div>
+  </div>
+</section>
+
+<section class="section watch" id="model">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Model</span>
+      <h2 class="h2">The spending model is a starting benchmark, not a finished forecast.</h2>
+      <p class="lead">A Random Forest estimates Total_Amount from Age, Total_Purchases and Ratings. It is trained on a random 80/20 split with seed 42, and the fitted model is saved with Joblib for the Predictions page.</p>
+    </div>
+    <div class="two" style="margin-top:0">
+      <article class="card chart-card reveal">
+        <h3>How large is the error?</h3>
+        <p class="csub">Mean absolute error compared with the average row amount.</p>
+        <div class="hchart"><div class="hrow"><span class="hlab">Mean row amount</span><div class="htrack"><i class="hbar" style="--i:0;--s:1.0000"></i></div><b class="hval">₹1,367.27</b></div><div class="hrow"><span class="hlab">Mean absolute error</span><div class="htrack"><i class="hbar" style="--i:1;--s:0.4801"></i></div><b class="hval">₹656.45 · 48%</b></div></div>
+        <p class="fine">The error is about 48% of a typical row. That ratio is a rough scale check, not a complete measure of accuracy.</p>
+      </article>
+      <article class="card chart-card reveal" style="--d:110ms">
+        <h3>Model details</h3>
+        <p class="csub">As saved in the notebook and used by the app.</p>
+        <dl class="kv">
+          <dt>Target</dt><dd>Total_Amount</dd>
+          <dt>Features</dt><dd>Age, Total_Purchases, Ratings</dd>
+          <dt>Estimator</dt><dd>RandomForestRegressor with 100 trees</dd>
+          <dt>Validation</dt><dd>Random 80/20 split, random_state 42</dd>
+          <dt>Error</dt><dd>MAE of ₹656.45 on the test split</dd>
+          <dt>Saved as</dt><dd>Joblib model file, loaded by the Predictions page</dd>
+        </dl>
+      </article>
+    </div>
+    <div class="two">
+      <article class="card chart-card reveal">
+        <h3>Prediction inputs</h3>
+        <p class="csub">The three sliders on the Predictions page, with their ranges and defaults.</p>
+        <dl class="kv">
+          <dt>Customer Age</dt><dd><b>18 to 80</b> · default 30</dd>
+          <dt>Total Purchases</dt><dd><b>1 to 20</b> · default 5</dd>
+          <dt>Customer Rating</dt><dd><b>1.0 to 5.0</b> · default 3.5</dd>
+          <dt>Output</dt><dd>An estimated spend in rupees, from the saved Random Forest</dd>
+        </dl>
+      </article>
+      <article class="card fact reveal" style="--d:110ms">
+        <h3>What is still missing</h3>
+        <p>No median baseline, cross-validation, R², error distribution or time-based test is reported. The model has not been shown to work on later transactions, so treat ₹656.45 as the first benchmark to beat.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section watch" id="limits">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="kicker">Limitations</span>
+      <h2 class="h2">Known limitations, and what would fix each one.</h2>
+    </div>
+    <div class="grid3">
+      <article class="card fact reveal"><h3>Customer identity</h3><p>Zero-filled IDs merge unrelated records into one person. Keep missing IDs empty or label them unknown, and exclude them from customer counts and RFM.</p></article>
+      <article class="card fact reveal" style="--d:90ms"><h3>Missing source data</h3><p>The Dataset folder in the archive is empty. The notebook expects customer_purchase_data.csv, the app expects cleaned_customer_purchase_data.csv, and segmentation expects rfm_customer_segments.csv. Restore authorized copies before a clean run.</p></article>
+      <article class="card fact reveal" style="--d:180ms"><h3>Validation</h3><p>The model uses one random holdout split. Add a mean or median baseline, cross-validation, R² and a time-based test to show whether it generalizes.</p></article>
+      <article class="card fact reveal"><h3>Personal data</h3><p>The source includes names, emails, phone numbers and addresses. Analysis and prediction do not need them, so remove them from analytical extracts and limit access to raw data.</p></article>
+      <article class="card fact reveal" style="--d:90ms"><h3>Interface checks</h3><p>Some saved screenshots show a visible “undefined” label beside chart sections. Check every chart panel in a clean launch before a live demo.</p></article>
+      <article class="card fact reveal" style="--d:180ms"><h3>Wording</h3><p>The README describes the app as AI-generated. The insight text is rule-based and no language model is connected, so the label should say that plainly.</p></article>
+    </div>
+
+    <div class="callout warn reveal"><b>Imputed values, not observed ones.</b> Before totals, means and the model were calculated, blank values were filled. 350 Total_Amount values (0.12%) were replaced with the column median, and so were 361 Total_Purchases, 184 Ratings and 173 Age values. 359 blank dates were carried forward from the row above. Filled Total_Amount values are part of the ₹412.9M total and the model’s target. Filled Age, Total_Purchases and Ratings values are model inputs.</div>
+
+    <h3 class="sub-title reveal">Next steps, in priority order</h3>
+    <div class="tbl reveal">
+      <table>
+        <thead><tr><th>Priority</th><th>Recommended change</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pri pri-req">Required</span></td><td>Restore the raw, cleaned and RFM CSV files, or document an authorized source and the exact build steps.</td><td>The current archive cannot execute the analysis or data-driven app pages from a fresh setup.</td></tr>
+          <tr><td><span class="pri pri-req">Required</span></td><td>Keep missing customer IDs empty and exclude them from customer-level metrics.</td><td>Prevents unrelated purchases from becoming a false customer and extreme segment.</td></tr>
+          <tr><td><span class="pri pri-high">High</span></td><td>Recompute the cluster profiles and compare candidate values of k using silhouette score.</td><td>Checks whether five groups describe meaningful behavior.</td></tr>
+          <tr><td><span class="pri pri-high">High</span></td><td>Benchmark the spending model against a simple baseline, using repeated and time-based validation.</td><td>Shows whether the estimator improves on a simple forecast and generalizes to later transactions.</td></tr>
+          <tr><td><span class="pri pri-med">Medium</span></td><td>Remove direct identifiers from analytical extracts, record dataset and model versions, and verify all charts in a clean launch.</td><td>Improves privacy, repeatability and demo reliability.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="section watch" id="about">
+  <div class="wrap about">
+    <div class="reveal">
+      <div class="who">
+        <div class="who-mark">
+          <img src="../../../../main-images/image.jpg"
+               alt="Nikhil Kumar Vishwakrma"
+               class="profile-photo"
+               width="64" height="64"
+               loading="lazy" decoding="async">
+        </div>
+        <div><h2>Nikhil Kumar Vishwakrma</h2><p class="role">Data analyst, MIS analyst and Power BI developer</p></div>
+      </div>
+      <div class="about-copy">
+        <p>I turn raw data into clear analysis and practical dashboards. I care about data quality, business context and being honest about what the evidence can support, which is why this project shows its limitations up front.</p>
+        <dl class="kv">
+          <dt>Location</dt><dd>Bengaluru, Karnataka, India</dd>
+          <dt>Education</dt><dd>BCA, Data Science and Artificial Intelligence</dd>
+          <dt>University</dt><dd>Babu Banarasi Das University, Lucknow</dd>
+          <dt>Training</dt><dd>Data Analyst programme, NIELIT Lucknow (2026)</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="reveal" style="--d:110ms">
+      <div class="about-copy">
+        <h3 style="margin-bottom:12px;font-size:1.05rem;font-weight:600">About this project</h3>
+        <p>The Customer Purchase Behavior Analyzer was built as a complete analytics workflow, from cleaning transactions through segmentation and modeling to an interactive Streamlit app. This page sets out its methods, numbers and limits in plain language.</p>
+        <p>The full code and notebook are on GitHub: <a class="text-link" href="https://github.com/nikhilvishwakrma2002/customer-purchase-behavior-analysis-python-matplotlib-streamlit-ml" target="_blank" rel="noopener noreferrer">Customer-Purchase-Behavior-Analysis ↗</a>.</p>
+      </div>
+      <div class="card dl-card" style="margin-top:22px">
+        <h3>Project report</h3>
+        <p>The full report (V01, 13 November 2026) covers the data, methods, results, limitations and recommended next steps, with screenshots from the project archive.</p>
+        <a class="btn btn-primary" href="cpba-screens/NXDAXCPBA01_Customer_Purchase_Behavior_Analysis_Project_Report_V01_14Nov26.pdf" download style="margin-top:18px">Download project report (PDF) <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg></a>
+        <p class="meta">PDF · 9 pages · A4</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section watch" id="contact">
+  <div class="wrap">
+    <div class="card contact reveal">
+      <div>
+        <span class="kicker">Contact</span>
+        <h2 class="h2">Let’s talk about data, dashboards or analytics work.</h2>
+        <p>For analyst, MIS and Power BI roles, or a thoughtful analytics collaboration, choose whichever channel suits you best.</p>
+      </div>
+      <div class="contact-actions">
+        <a class="btn btn-primary" href="mailto:nikhilvishwakrma2002@gmail.com">Email Nikhil <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-ghost" href="https://wa.me/916393004528" target="_blank" rel="noopener">WhatsApp <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-ghost" href="tel:+916393004528">Phone: +91 63930 04528</a>
+        <a class="btn btn-ghost" href="https://www.linkedin.com/in/nikhilvishwakrma2002/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+        <a class="btn btn-ghost" href="https://github.com/nikhilvishwakrma2002" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="contact-extra">
+        <div class="contact-location">
+          <span class="contact-label">Location</span>
+          <strong>Bengaluru, Karnataka, India</strong>
+          <span>nikhilvishwakrma2002@gmail.com</span>
+        </div>
+        <div class="contact-chips">
+          <a href="https://t.me/nikhilvishwakrma" target="_blank" rel="noopener">Telegram <span aria-hidden="true">↗</span></a>
+          <a href="https://instagram.com/nikhilvishwakrma2002" target="_blank" rel="noopener">Instagram <span aria-hidden="true">↗</span></a>
+          <a href="https://nikhilvishwakrma2002.github.io/nikhil/" target="_blank" rel="noopener">Portfolio website <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer reveal">
+  <div class="wrap">
+    <span>© <span id="year">2026</span> Nikhil Kumar Vishwakrma. All rights reserved. Lucknow, INIDA 🇮🇳</span>
+    <div class="footer-links"><a href="cpba-screens/NXDAXCPBA01_Customer_Purchase_Behavior_Analysis_Project_Report_V01_14Nov26.pdf" download>Download report (PDF)</a><a href="../../../../index.html#work">Back to portfolio</a><a href="#overview">Back to top ↑</a></div>
+  </div>
+</footer>
+
+<button class="chat-fab" id="fab" type="button" aria-expanded="false" aria-controls="chat">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+  <span>Ask about CPBA</span>
+</button>
+<div class="chat" id="chat" role="dialog" aria-label="Ask about CPBA">
+  <div class="chat-h">
+    <div><strong>Ask about CPBA</strong><small>Answers come from notes on this project</small></div>
+    <button class="x" id="close" type="button" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-log" id="log" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <a class="wa-link" href="https://wa.me/916393004528" target="_blank" rel="noopener">Continue on WhatsApp</a>
+  <form id="form" autocomplete="off">
+    <input id="q" placeholder="Ask about the data, model or contact" aria-label="Your question" maxlength="200">
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<script>
+
+(function(){
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var canObserve = "IntersectionObserver" in window;
+  var CLUSTERS = [{"n": "Cluster 0", "m": 5818.908891}, {"n": "Cluster 1", "m": 2499.752282}, {"n": "Cluster 2", "m": 10287.716304}, {"n": "Cluster 3", "m": 2632.413723}, {"n": "Cluster 4 (placeholder)", "m": 445374.403857, "p": 1}];
+  var BP = 1080;
+
+  /* ---------- Constellation background (same engine as the portfolio home page) ---------- */
+  var networkCanvas = document.getElementById("ambient-network");
+  var networkCtx = networkCanvas && networkCanvas.getContext ? networkCanvas.getContext("2d", { alpha:true }) : null;
+  var networkWidth = 0, networkHeight = 0, networkDpr = 1;
+  var networkPoints = [], networkPaths = [];
+  var networkFrame = null, networkLastFrame = 0, networkResizeTimer = null, networkScrollTimer = null;
+  var STATIC_NETWORK = true;
+  var LINK_BUCKETS = 5, LINK_ALPHA = .26, EDGE = 20;
+
+  function makeGlow(size, stops){
+    var glow = document.createElement("canvas");
+    glow.width = glow.height = size;
+    var g = glow.getContext("2d");
+    var half = size / 2;
+    var grad = g.createRadialGradient(half, half, 0, half, half, half);
+    for (var s = 0; s < stops.length; s++) grad.addColorStop(stops[s][0], stops[s][1]);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, size, size);
+    return glow;
+  }
+  var networkGlow = makeGlow(24, [[0,"rgba(241,223,180,.55)"],[.4,"rgba(241,223,180,.12)"],[1,"rgba(241,223,180,0)"]]);
+
+  function newNetworkPoint(){
+    var angle = Math.random() * Math.PI * 2;
+    var depth = .35 + Math.random() * .65;
+    var speed = (6 + Math.random() * 8) * (.45 + depth * .7);
+    var vx = Math.cos(angle) * speed, vy = Math.sin(angle) * speed;
+    return { x:Math.random() * networkWidth, y:Math.random() * networkHeight, vx:vx, vy:vy, bx:vx, by:vy, z:depth, phase:Math.random() * Math.PI * 2 };
+  }
+  function resizeNetwork(){
+    if (!networkCanvas || !networkCtx) return;
+    networkWidth = Math.max(1, window.innerWidth || document.documentElement.clientWidth);
+    networkHeight = Math.max(1, window.innerHeight || document.documentElement.clientHeight);
+    networkDpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    networkCanvas.width = Math.round(networkWidth * networkDpr);
+    networkCanvas.height = Math.round(networkHeight * networkDpr);
+    networkCtx.setTransform(networkDpr, 0, 0, networkDpr, 0, 0);
+    var pointCount = Math.max(16, Math.min(34, Math.round(networkWidth * networkHeight / 44000)));
+    while (networkPoints.length < pointCount) networkPoints.push(newNetworkPoint());
+    networkPoints.length = pointCount;
+    if (reduce || STATIC_NETWORK) drawNetwork(0);
+  }
+  function drawNetwork(timestamp){
+    networkFrame = null;
+    if (!networkCtx || (!reduce && document.hidden)) return;
+    if (!reduce && networkLastFrame && timestamp - networkLastFrame < 33) {
+      networkFrame = window.requestAnimationFrame(drawNetwork);
+      return;
+    }
+    var delta = networkLastFrame ? Math.min((timestamp - networkLastFrame) / 1000, .05) : 0;
+    networkLastFrame = timestamp;
+    networkCtx.clearRect(0, 0, networkWidth, networkHeight);
+    var linkDistance = Math.max(116, Math.min(156, Math.min(networkWidth, networkHeight) * .17));
+    var relax = Math.min(1, delta * 1.5);
+    var breathe = reduce ? 1 : 1 + Math.sin(timestamp * .00045) * .12;
+
+    if (!reduce) {
+      networkPoints.forEach(function(point){
+        var turn = Math.sin(timestamp * .00022 + point.phase) * .12 * delta;
+        var cosT = Math.cos(turn), sinT = Math.sin(turn);
+        var rotatedX = point.bx * cosT - point.by * sinT;
+        point.by = point.bx * sinT + point.by * cosT;
+        point.bx = rotatedX;
+        point.vx += (point.bx - point.vx) * relax;
+        point.vy += (point.by - point.vy) * relax;
+        point.x += point.vx * delta;
+        point.y += point.vy * delta;
+        if (point.x < -EDGE) point.x += networkWidth + EDGE * 2;
+        else if (point.x > networkWidth + EDGE) point.x -= networkWidth + EDGE * 2;
+        if (point.y < -EDGE) point.y += networkHeight + EDGE * 2;
+        else if (point.y > networkHeight + EDGE) point.y -= networkHeight + EDGE * 2;
+      });
+    }
+
+    networkCtx.strokeStyle = "#d8c18e";
+    networkCtx.lineWidth = .8;
+    for (var b = 0; b < LINK_BUCKETS; b++) networkPaths[b] = new Path2D();
+    var count = networkPoints.length;
+    for (var i = 0; i < count; i++) {
+      var a = networkPoints[i];
+      for (var j = i + 1; j < count; j++) {
+        var c = networkPoints[j];
+        var dx = a.x - c.x, dy = a.y - c.y;
+        var distSq = dx * dx + dy * dy;
+        if (distSq < linkDistance * linkDistance) {
+          var distance = Math.sqrt(distSq);
+          var strength = (1 - distance / linkDistance) * (.45 + .55 * (a.z + c.z) / 2);
+          var bucket = Math.min(LINK_BUCKETS - 1, Math.floor(strength * LINK_BUCKETS));
+          networkPaths[bucket].moveTo(a.x, a.y);
+          networkPaths[bucket].lineTo(c.x, c.y);
+        }
+      }
+    }
+    for (var k = 0; k < LINK_BUCKETS; k++) {
+      networkCtx.globalAlpha = (k + .5) / LINK_BUCKETS * LINK_ALPHA * breathe;
+      networkCtx.stroke(networkPaths[k]);
+    }
+    networkPoints.forEach(function(point){
+      var pulse = reduce ? 0 : Math.sin(timestamp * .0012 + point.phase);
+      var glowSize = 10 + point.z * 10;
+      networkCtx.globalAlpha = Math.max(0, (.22 + point.z * .3) * (1 + pulse * .2));
+      networkCtx.drawImage(networkGlow, point.x - glowSize / 2, point.y - glowSize / 2, glowSize, glowSize);
+      networkCtx.globalAlpha = Math.min(1, .45 + point.z * .4 + pulse * .1);
+      networkCtx.fillStyle = "#f1dfb4";
+      networkCtx.beginPath();
+      networkCtx.arc(point.x, point.y, .75 + point.z * 1 + (pulse + 1) * .15 * point.z, 0, Math.PI * 2);
+      networkCtx.fill();
+    });
+    networkCtx.globalAlpha = 1;
+    if (!STATIC_NETWORK && !reduce && !document.hidden) networkFrame = window.requestAnimationFrame(drawNetwork);
+  }
+  function startNetwork(){
+    if (!networkCtx) return;
+    if (reduce || STATIC_NETWORK) { drawNetwork(0); return; }
+    if (!document.hidden && networkFrame === null) {
+      networkLastFrame = 0;
+      networkFrame = window.requestAnimationFrame(drawNetwork);
+    }
+  }
+  resizeNetwork();
+  if (!reduce) startNetwork();
+  window.addEventListener("resize", function(){
+    clearTimeout(networkResizeTimer);
+    networkResizeTimer = setTimeout(function(){
+      var widthChanged = Math.abs((window.innerWidth || 0) - networkWidth) > 0;
+      var heightChanged = Math.abs((window.innerHeight || 0) - networkHeight) > 120;
+      if (widthChanged || heightChanged) resizeNetwork();
+    }, 180);
+  }, { passive:true });
+  document.addEventListener("visibilitychange", function(){
+    if (document.hidden && networkFrame !== null) { window.cancelAnimationFrame(networkFrame); networkFrame = null; }
+    else startNetwork();
+  });
+
+  /* ---------- Header state, scroll progress, background pause during scroll ---------- */
+  var header = document.querySelector(".site-header");
+  var progress = document.querySelector(".progress");
+  var ticking = false;
+  var navLock = false, navLockTimer = null;
+  function onScroll(){
+    var y = window.pageYOffset || document.documentElement.scrollTop;
+    var max = document.documentElement.scrollHeight - window.innerHeight;
+    var isScrolled = y > 12;
+    if (isScrolled !== header.classList.contains("is-scrolled")) header.classList.toggle("is-scrolled", isScrolled);
+    progress.style.transform = "scaleX(" + (max > 0 ? Math.min(y / max, 1) : 0) + ")";
+    ticking = false;
+  }
+  window.addEventListener("scroll", function(){
+    if (!ticking) { ticking = true; window.requestAnimationFrame(onScroll); }
+    if (navLock) { clearTimeout(navLockTimer); navLockTimer = setTimeout(releaseNavLock, 200); }
+    /* Decorative background is rendered once; scrolling stays compositor-friendly. */
+  }, { passive:true });
+  onScroll();
+
+  /* ---------- Mobile navigation ---------- */
+  var toggle = document.querySelector(".nav-toggle");
+  var nav = document.getElementById("primary-nav");
+  var navShell = document.querySelector(".nav-shell");
+  function setMenu(open){
+    nav.classList.toggle("is-open", open);
+    navShell.classList.toggle("menu-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+  }
+  toggle.addEventListener("click", function(){ setMenu(toggle.getAttribute("aria-expanded") !== "true"); });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && nav.classList.contains("is-open")) { setMenu(false); toggle.focus(); }
+    if (e.key === "Escape" && chat.classList.contains("open")) setChat(false);
+  });
+
+  /* ---------- Sliding pill: follows hover or keyboard focus, otherwise rests on the section in view ---------- */
+  var pill = nav.querySelector(".nav-pill");
+  var navLinks = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+  var activeLink = null, hoverLink = null, focusLink = null, pillReady = false;
+  function currentPillTarget(){ return hoverLink || focusLink || activeLink; }
+  function paintPill(link, instant){
+    if (!pill) return;
+    if (!link || window.innerWidth <= BP) { pill.style.opacity = "0"; return; }
+    var jump = instant || !pillReady;
+    pillReady = true;
+    if (jump) pill.style.transition = "none";
+    pill.style.width = link.offsetWidth + "px";
+    pill.style.transform = "translate3d(" + link.offsetLeft + "px,0,0)";
+    pill.style.opacity = "1";
+    if (jump) { void pill.offsetWidth; pill.style.transition = ""; }
+  }
+  navLinks.forEach(function(link){
+    if (link.classList.contains("nav-contact")) return;
+    link.addEventListener("pointerenter", function(e){ if (e.pointerType !== "mouse") return; hoverLink = link; paintPill(link); });
+    link.addEventListener("focus", function(){ if (!link.matches(":focus-visible")) return; focusLink = link; paintPill(link); });
+    link.addEventListener("click", function(){ setMenu(false); });
+  });
+  nav.addEventListener("pointerleave", function(e){ if (e.pointerType !== "mouse") return; hoverLink = null; paintPill(currentPillTarget()); });
+  nav.addEventListener("focusout", function(){ focusLink = null; paintPill(currentPillTarget()); });
+
+  var secIds = ["findings","pipeline","segments","model","limits","about","contact"];
+  var navSections = secIds.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  function setActiveSection(id, instant){
+    navLinks.forEach(function(link){
+      var active = link.getAttribute("href") === "#" + id;
+      link.classList.toggle("is-active", active);
+      if (active) { link.setAttribute("aria-current", "location"); if (!link.classList.contains("nav-contact")) activeLink = link; }
+      else link.removeAttribute("aria-current");
+    });
+    paintPill(currentPillTarget(), instant);
+  }
+  function sectionInBand(){
+    var band = window.innerHeight * .475, found = null;
+    navSections.forEach(function(section){
+      var rect = section.getBoundingClientRect();
+      if (rect.top <= band && rect.bottom >= band) found = section;
+    });
+    return found;
+  }
+  function releaseNavLock(){
+    navLock = false;
+    var current = sectionInBand();
+    if (current) setActiveSection(current.id);
+  }
+  function holdNavLock(id){
+    setActiveSection(id, true);
+    navLock = true;
+    clearTimeout(navLockTimer);
+    navLockTimer = setTimeout(releaseNavLock, 900);
+  }
+  nav.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener("click", function(){ holdNavLock(a.getAttribute("href").slice(1)); });
+  });
+  if (canObserve && navSections.length) {
+    var navObserver = new IntersectionObserver(function(entries){
+      if (navLock) return;
+      entries.forEach(function(entry){ if (entry.isIntersecting) setActiveSection(entry.target.id); });
+    }, { rootMargin: "-45% 0px -50% 0px", threshold: 0 });
+    navSections.forEach(function(section){ navObserver.observe(section); });
+  }
+  window.addEventListener("resize", function(){
+    if (window.innerWidth > BP) setMenu(false);
+    paintPill(currentPillTarget(), true);
+  });
+  window.addEventListener("load", function(){ paintPill(currentPillTarget(), true); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ paintPill(currentPillTarget(), true); });
+
+  /* ---------- Staggered reveal on scroll ---------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll(".reveal, .watch"));
+  revealEls.forEach(function(el){
+    if (!el.classList.contains("reveal") || el.style.getPropertyValue("--d")) return;
+    var siblings = Array.prototype.filter.call(el.parentElement.children, function(child){ return child.classList.contains("reveal"); });
+    el.style.setProperty("--d", Math.min(siblings.indexOf(el), 5) * 110 + "ms");
+  });
+  if (reduce || !canObserve) {
+    revealEls.forEach(function(el){ el.classList.add("in"); });
+  } else {
+    var revealObserver = new IntersectionObserver(function(entries, observer){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { entry.target.classList.add("in"); observer.unobserve(entry.target); }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealEls.forEach(function(el){ revealObserver.observe(el); });
+  }
+
+  /* ---------- Count-up numbers ---------- */
+  var counters = Array.prototype.slice.call(document.querySelectorAll("[data-count]"));
+  function paintCount(el, t){
+    var target = parseFloat(el.getAttribute("data-count")) || 0;
+    var dec = parseInt(el.getAttribute("data-dec") || "0", 10);
+    var pre = el.getAttribute("data-prefix") || "";
+    var suf = el.getAttribute("data-suffix") || "";
+    el.textContent = pre + (target * t).toLocaleString("en-US", { minimumFractionDigits: dec, maximumFractionDigits: dec }) + suf;
+  }
+  function countUp(el){
+    var start = null, duration = 1600;
+    function frame(ts){
+      if (start === null) start = ts;
+      var t = Math.min((ts - start) / duration, 1);
+      paintCount(el, 1 - Math.pow(1 - t, 3));
+      if (t < 1) window.requestAnimationFrame(frame);
+    }
+    window.requestAnimationFrame(frame);
+  }
+  if (!reduce && canObserve) {
+    counters.forEach(function(el){ paintCount(el, 0); });
+    var countObserver = new IntersectionObserver(function(entries, observer){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { countUp(entry.target); observer.unobserve(entry.target); }
+      });
+    }, { threshold: 0.5 });
+    counters.forEach(function(el){ countObserver.observe(el); });
+  }
+
+  /* ---------- Cluster view toggle ---------- */
+  function money(v){ return "₹" + v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function renderClusterBars(mode){
+    var list = mode === "real" ? CLUSTERS.filter(function(c){ return !c.p; }) : CLUSTERS;
+    var max = Math.max.apply(null, list.map(function(c){ return c.m; }));
+    var el = document.getElementById("bars");
+    if (!el) return;
+    el.innerHTML = list.map(function(c, i){
+      var s = (c.m / max).toFixed(4);
+      return '<div class="hrow"><span class="hlab">' + c.n + '</span><div class="htrack"><i class="hbar' + (c.p ? ' is-ph' : '') + '" style="--i:' + i + ';--s:' + s + '"></i></div><b class="hval">' + money(c.m) + '</b></div>';
+    }).join("");
+  }
+  var segButtons = Array.prototype.slice.call(document.querySelectorAll(".seg button"));
+  segButtons.forEach(function(b){
+    b.addEventListener("click", function(){
+      segButtons.forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
+      renderClusterBars(b.getAttribute("data-mode"));
+    });
+  });
+
+  /* ---------- Project chat (answers from notes on this project, no external service) ---------- */
+  var K = {
+    hello: "Hi! I’m the CPBA assistant. Pick a question below or type your own.",
+    about: "CPBA is a Python and Streamlit project. It cleans a 302,010-row purchase dataset, summarizes sales, groups customers with RFM and K-Means, and estimates spending with a Random Forest. The app has six pages: Home, Dashboard, Segmentation, Predictions, Business Insights and About.",
+    model: "The Random Forest’s mean absolute error is ₹656.45 on a random 80/20 split. That is about 48% of the mean row amount of ₹1,367.27, so it is a starting benchmark rather than proof of readiness. No baseline or cross-validation has been reported yet.",
+    cluster: "Missing customer IDs were filled with zero, so 308 unrelated transactions were merged into one fake customer worth ₹445,374.40. K-Means isolated that group as cluster 4. Leave it out of segment conclusions until IDs are handled correctly.",
+    data: "The archive’s Dataset folder is empty, so the notebook and app cannot run end to end yet. The next step is restoring the three CSV files or documenting an authorized source.",
+    tools: "Python, Pandas and NumPy for data work, scikit-learn for K-Means and Random Forest, Joblib for saving models, Plotly for charts, and Streamlit for the app. Matplotlib and Seaborn appear in the notebook.",
+    contact: "You can reach Nikhil on WhatsApp at +91 63930 04528 or by email at nikhilvishwakrma2002@gmail.com. LinkedIn, GitHub and the portfolio links are in the contact section.",
+    report: "Use the Download project report (PDF) button at the top of this page. It is the full 9-page report, covering methods, results, limitations and recommended next steps.",
+    sales: "Total_Amount adds up to ₹412,922,905.96 across 302,006 rows. By category, Electronics leads with 23.7%. By segment, Regular customers bring in 48.5%. Pepsi is the top brand in the notebook’s chart, but that lead needs checking. The USA-as-top-country claim is supported only by a saved screenshot.",
+    fallback: "I can answer questions about CPBA’s data, model, limitations and contact details. For anything else, message Nikhil directly on WhatsApp."
+  };
+  function pick(t){
+    t = t.toLowerCase();
+    if (/cluster 4|placeholder|zero|missing id|outlier|null/.test(t)) return K.cluster;
+    if (/accura|mae|error|model|predict|random forest|forecast/.test(t)) return K.model;
+    if (/csv|dataset|data|missing|folder|run/.test(t)) return K.data;
+    if (/tool|stack|tech|python|library|built|streamlit/.test(t)) return K.tools;
+    if (/contact|email|phone|whatsapp|reach|hire|call|telegram|linkedin|github/.test(t)) return K.contact;
+    if (/report|pdf|download|document|docx/.test(t)) return K.report;
+    if (/sales|revenue|country|categor|brand|gender|monthly|spend|top/.test(t)) return K.sales;
+    if (/what|about|cpba|project|overview|explain/.test(t)) return K.about;
+    return K.fallback;
+  }
+  var fab = document.getElementById("fab"), chat = document.getElementById("chat"), log = document.getElementById("log"), form = document.getElementById("form"), q = document.getElementById("q");
+  function add(text, who){
+    var d = document.createElement("div");
+    d.className = "msg " + who;
+    d.textContent = text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+  function bot(text){
+    var t = document.createElement("div");
+    t.className = "typing";
+    t.innerHTML = "<i></i><i></i><i></i>";
+    log.appendChild(t);
+    log.scrollTop = log.scrollHeight;
+    setTimeout(function(){ t.remove(); add(text, "bot"); }, reduce ? 0 : 650);
+  }
+  function send(text){
+    text = text.trim();
+    if (!text) return;
+    add(text, "me");
+    bot(pick(text));
+  }
+  function setChat(open){
+    chat.classList.toggle("open", open);
+    fab.setAttribute("aria-expanded", String(open));
+    if (open && !log.children.length) bot(K.hello);
+    if (open && window.matchMedia("(pointer: fine)").matches) q.focus();
+  }
+  fab.addEventListener("click", function(){ setChat(!chat.classList.contains("open")); });
+  document.getElementById("close").addEventListener("click", function(){ setChat(false); fab.focus(); });
+  document.querySelectorAll("[data-open-chat]").forEach(function(b){ b.addEventListener("click", function(){ setChat(true); }); });
+  ["What is CPBA?", "How accurate is the model?", "Why is cluster 4 flagged?", "Where is the PDF report?", "What tools were used?", "How can I contact Nikhil?"].forEach(function(t){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.textContent = t;
+    b.addEventListener("click", function(){ send(t); });
+    document.getElementById("chips").appendChild(b);
+  });
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+    var v = q.value;
+    q.value = "";
+    send(v);
+  });
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+})();
+
+</script>
+</body>
+</html>

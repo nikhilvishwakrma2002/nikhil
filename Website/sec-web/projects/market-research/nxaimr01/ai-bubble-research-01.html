@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="The AI Investment Boom: bubble risk, financial interdependence and lessons from past market crashes. Research brief by Nikhil Kumar Vishwakrma.">
+<meta name="author" content="Nikhil Kumar Vishwakrma">
+<link rel="icon" type="image/png" href="../../../../main-images/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<title>The AI Investment Boom | Nikhil Kumar Vishwakrma</title>
+<script>document.documentElement.classList.add("js")</script>
+<style>
+:root{color-scheme:dark;--ink:#f4f1ea;--muted:#bdb7aa;--dim:#8d877b;--gold:#d8c18e;--gold2:#f1dfb4;--line:rgba(255,255,255,.09);--glass:linear-gradient(180deg,rgba(24,22,19,.97),rgba(14,13,11,.97));--ease:cubic-bezier(.2,.7,.2,1);--red:#ef9a83;--green:#68d8a7;--blue:#8bb6e8;--max:1160px}
+*,*::before,*::after{box-sizing:border-box}
+html{background:#000;scroll-behavior:smooth;scroll-padding-top:100px;overflow-x:clip}
+body{margin:0;color:var(--ink);font:400 16px/1.7 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,p,ul,ol{margin:0}
+h1,h2,h3{color:var(--ink);text-wrap:balance}
+p{color:var(--muted);text-wrap:pretty}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:10px}
+::selection{background:var(--gold);color:#000}
+.wrap{width:min(var(--max),calc(100% - 48px));margin-inline:auto}
+.ambient{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse 58% 52% at 12% 8%,rgba(216,193,142,.14),transparent 72%),radial-gradient(ellipse 48% 46% at 88% 28%,rgba(173,127,59,.09),transparent 76%),radial-gradient(ellipse 58% 52% at 57% 94%,rgba(128,93,45,.075),transparent 76%),#020202}
+.network{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
+@media (max-width:820px){.network{opacity:.7}}
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold2));transform:scaleX(0);transform-origin:0 50%;z-index:70}
+.card{position:relative;isolation:isolate;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:var(--glass);box-shadow:0 30px 60px -30px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.07);padding:clamp(22px,3vw,30px);transition:border-color .45s var(--ease),transform .5s var(--ease);contain:layout style}
+.card:hover{border-color:rgba(216,193,142,.34)}
+.card h3{margin-bottom:8px;font-size:1rem;font-weight:600;letter-spacing:-.01em}
+.card p{font-size:.9rem;line-height:1.6}
+@media (hover:hover) and (pointer:fine){.lift:hover{transform:translate3d(0,-4px,0)}}
+.kicker{display:inline-flex;align-items:center;margin-bottom:14px;color:var(--gold);font-size:.72rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase}
+.kicker::before{content:"";width:0;height:1px;background:var(--gold);transition:width .9s var(--ease) .25s,margin-right .9s var(--ease) .25s}
+.sec.in .kicker::before{width:28px;margin-right:12px}
+.h2{margin-bottom:14px;font-size:clamp(2rem,3.9vw,3.1rem);font-weight:700;line-height:1.1;letter-spacing:-.04em}
+.ph{margin-bottom:12px;font-size:1.5rem;font-weight:700;line-height:1.2;letter-spacing:-.03em}
+.sh{margin-top:36px;font-size:1.2rem;font-weight:650;letter-spacing:-.02em}
+.lead{max-width:64ch;margin-top:14px;font-size:1rem;line-height:1.75}
+.lead strong{color:var(--ink);font-weight:600}
+.mt{margin-top:18px}
+.note{margin-top:10px;color:var(--dim);font-size:.78rem;line-height:1.55}
+.sub{color:var(--dim);font-size:.8rem}
+.js .rv:not(.in){opacity:0}
+.rv.in{animation:rise .95s var(--ease) backwards;animation-delay:var(--d,0ms)}
+.enter{animation:rise 1s var(--ease) backwards;animation-delay:var(--d,0ms)}
+@keyframes rise{from{opacity:0;transform:translate3d(0,24px,0)}to{opacity:1;transform:none}}
+@keyframes lineUp{from{transform:translate3d(0,108%,0)}to{transform:none}}
+@keyframes ping{from{transform:scale(.6);opacity:1}to{transform:scale(2.2);opacity:0}}
+@keyframes navIn{from{opacity:0;transform:translate3d(0,-14px,0)}to{opacity:1;transform:none}}
+.top{position:sticky;top:10px;z-index:30;margin-top:10px}
+.nav-shell{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:70px;padding:8px 12px 8px 14px;border:1px solid rgba(246,229,198,.18);border-radius:999px;background:rgba(10,10,9,.94);box-shadow:0 14px 42px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.06);animation:navIn .9s var(--ease) both}
+.top.is-scrolled .nav-shell{border-color:rgba(216,193,142,.26)}
+.brand{display:flex;align-items:center;gap:12px;flex:none}
+.mark{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid rgba(216,193,142,.3);background:rgba(216,193,142,.12);color:var(--gold);font-size:.75rem;font-weight:700;overflow:hidden;flex:none}
+.mark img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 37%;border-radius:50%}
+.bt b{display:block;font-size:.88rem;font-weight:600;letter-spacing:-.015em}
+.bt small{display:block;margin-top:3px;color:#a9a18f;font-size:.71rem}
+.links{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:2px;padding:5px;border:1px solid rgba(246,229,198,.075);border-radius:999px;background:rgba(255,244,220,.025)}
+.links a{padding:7px 10px;border-radius:999px;color:#d3c9b7;font-size:.8rem;font-weight:600;transition:color .18s,background .18s}
+.links a:hover,.links a.on{color:#fff5df;background:rgba(216,193,142,.105)}
+.links .hl{color:#21180b;background:linear-gradient(135deg,#f3dcae,#d8a452)}
+.links .hl:hover{color:#21180b;background:#f8e5bd}
+.nav-toggle{display:none;width:42px;height:42px;place-items:center;border:1px solid rgba(216,193,142,.25);border-radius:50%;background:rgba(216,193,142,.08);cursor:pointer;flex:none}
+.nav-toggle svg{width:20px;height:20px}
+.hero{padding:clamp(48px,8vw,100px) 0 clamp(40px,6vw,70px)}
+.hg{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(40px,6vw,80px);align-items:center}
+.eyebrow{display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px;padding:7px 14px 7px 12px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.06);color:var(--muted);font-size:.78rem;font-weight:500}
+/* .pulse{position:relative;width:8px;height:8px;border-radius:50%;background:#4fd39a}
+.pulse::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(79,211,154,.6);animation:ping 2.4s var(--ease) infinite} */
+.display{margin:24px 0 22px;font-size:clamp(2.7rem,5.8vw,5rem);font-weight:700;line-height:1.02;letter-spacing:-.05em}
+.ln{display:block;overflow:hidden;padding-bottom:.08em}
+.ln>span{display:inline-block;animation:lineUp 1.05s var(--ease) both}
+.ln+.ln>span{animation-delay:.14s}
+.acc{color:var(--gold)}
+.hero .lead{font-size:clamp(1rem,1.3vw,1.08rem);line-height:1.75}
+.btns{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 22px;border:1px solid transparent;border-radius:999px;font-size:.9rem;font-weight:600;transition:transform .3s var(--ease),background .3s,border-color .3s,color .3s}
+.btn:hover{transform:translateY(-2px)}
+.btn-p{background:var(--gold);color:#000}
+.btn-p:hover{background:var(--gold2)}
+.btn-g{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:var(--ink)}
+.btn-g:hover{border-color:rgba(216,193,142,.5);color:var(--gold)}
+.hmeta{margin-top:22px;color:var(--dim);font-size:.84rem}
+.hmeta strong{color:var(--muted);font-weight:500}
+.q{margin-top:18px;padding:16px 18px;border:1px solid rgba(216,193,142,.18);border-radius:16px;background:rgba(216,193,142,.06);color:#ded5c4;font-size:.92rem;line-height:1.6}
+.q strong{color:var(--gold2)}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:clamp(40px,5vw,56px)}
+.stat{padding:22px}
+.stat b{display:block;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:6px;color:var(--muted);font-size:.8rem;line-height:1.5}
+.sec{position:relative;padding:clamp(80px,10vw,120px) 0;border-top:1px solid var(--line);scroll-margin-top:100px}
+.sec::before{content:"";position:absolute;top:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(216,193,142,.6),transparent);transition:transform 1.8s var(--ease) .15s}
+.js .sec:not(.in)::before{transform:scaleX(0)}
+.sechead{max-width:780px}
+.g2,.g3{display:grid;gap:14px;margin-top:22px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.call{margin-top:18px;padding:18px 20px;border:1px solid rgba(216,193,142,.28);border-left:3px solid var(--gold);border-radius:16px;background:rgba(216,193,142,.06);font-size:.95rem;line-height:1.66}
+.call p{color:#ded5c4}
+.call strong{color:var(--gold2)}
+.call.warn{border-color:rgba(239,154,131,.3);border-left-color:var(--red);background:rgba(239,154,131,.05)}
+.sys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:28px}
+.node{padding:20px}
+.loop{margin-top:16px;color:var(--muted);font-size:.92rem}
+.loop b{color:var(--green);font-weight:600}
+.loop.bad b{color:var(--red)}
+.pill-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}
+.pill{padding:8px 13px;border:1px solid var(--line);border-radius:12px;background:var(--glass);color:#e4dccb;font-size:.86rem}
+.arr{color:var(--gold)}
+.tw{margin-top:18px;overflow-x:auto;border:1px solid var(--line);border-radius:20px;background:#0c0b09}
+table{width:100%;min-width:620px;border-collapse:collapse;font-size:.88rem}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:rgba(216,193,142,.07);color:var(--gold2);font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+td{color:#d7d1c5;line-height:1.55}
+td b{color:var(--ink);font-weight:600}
+tr:last-child td{border-bottom:0}
+.list{list-style:none;display:grid;gap:10px;margin-top:12px;padding:0}
+.list li{position:relative;padding-left:18px;color:var(--muted);font-size:.92rem;line-height:1.62}
+.list li::before{content:"";position:absolute;left:0;top:.72em;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+.list b{color:var(--ink);font-weight:600}
+.row{display:grid;grid-template-columns:minmax(0,160px) minmax(0,1fr) auto;gap:12px;align-items:center;margin:14px 0;color:var(--muted);font-size:.88rem}
+.track{height:10px;border-radius:99px;background:rgba(255,255,255,.05);overflow:hidden}
+.fill{display:block;height:100%;width:var(--w);border-radius:99px;background:var(--c,var(--gold));transform-origin:0 50%}
+.js .fill{transform:scaleX(0);transition:transform 1.2s var(--ease) .25s}
+.in .fill{transform:none}
+.val{color:var(--ink);font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.calc label{display:block;margin-bottom:16px;color:var(--muted);font-size:.92rem}
+.calc label>span{display:flex;justify-content:space-between;margin-bottom:6px}
+.calc output{color:var(--gold2);font-weight:600;font-variant-numeric:tabular-nums}
+.calc input{width:100%;accent-color:var(--gold)}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.res div{padding:16px;border:1px solid rgba(216,193,142,.28);border-radius:14px;background:rgba(216,193,142,.06)}
+.res span{display:block;color:var(--muted);font-size:.8rem}
+.res b{display:block;margin-top:4px;color:var(--gold2);font-size:clamp(1.3rem,3vw,1.8rem);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.src{columns:2;column-gap:28px;margin-top:18px;padding-left:22px;color:var(--dim);font-size:.82rem;line-height:1.55}
+.src li{break-inside:avoid;margin-bottom:6px}
+.src li::marker{color:var(--gold)}
+.lks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:26px}
+.lk{display:block;padding:18px;border:1px solid var(--line);border-radius:20px;background:var(--glass);transition:border-color .3s}
+.lk:hover{border-color:rgba(216,193,142,.36)}
+.lk small{display:block;color:var(--gold);font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.lk span{display:block;margin-top:6px;color:var(--ink);font-size:.9rem;word-break:break-all}
+.foot{padding:30px 0 calc(34px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);color:var(--dim);font-size:.82rem;line-height:1.6}
+.foot p{color:var(--dim)}
+.foot a{color:var(--gold)}
+@media (max-width:1000px){
+.hg{grid-template-columns:1fr}
+.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.sys{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lks{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:860px){
+.nav-shell{flex-wrap:wrap;border-radius:26px;padding:9px 12px 9px 14px}
+.nav-toggle{display:grid}
+.links{display:none;width:100%;flex-direction:column;align-items:stretch;border:0;padding:4px 0 10px;background:none}
+.links.open{display:flex}
+.links a{padding:10px 12px}
+}
+@media (max-width:640px){
+.wrap{width:calc(100% - 32px)}
+.g2,.g3,.sys,.stats,.lks{grid-template-columns:1fr}
+.row{grid-template-columns:110px minmax(0,1fr) auto;gap:10px}
+.src{columns:1}
+}
+@media (prefers-reduced-motion:reduce){
+html{scroll-behavior:auto}
+*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+.js .rv:not(.in){opacity:1}
+.js .fill{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true"><canvas class="network" aria-hidden="true"></canvas></div>
+<div class="progress" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="wrap nav-shell">
+    <a class="brand" href="#top" aria-label="Back to top"><span class="mark"><span>NK</span><img src="../../../../main-images/image.jpg" alt="" width="44" height="44" onerror="this.remove()"></span><span class="bt"><b>Nikhil Kumar Vishwakrma</b><small>AI investment boom</small></span></a>
+    <button class="nav-toggle" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="links" id="nav" aria-label="Sections"><a class="hl" href="../../../../index.html#work">Back to portfolio</a><a href="#summary">Summary</a><a href="#sources">Sources</a><a href="#contact">Contact</a></nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top">
+  <div class="wrap hg">
+    <div>
+      <p class="eyebrow enter" style="--d:0ms"><span class="pulse" aria-hidden="true"></span><span>Global markets · Research brief</span><span>Evidence to 17 Nov 2026</span></p>
+      <h1 class="display"><span class="ln"><span>The AI investment</span></span><span class="ln"><span class="acc">boom, examined.</span></span></h1>
+      <p class="lead enter" style="--d:200ms">Bubble risk, financial interdependence and lessons from past market crashes. This is an evidence-led market-risk report, <strong>not a personal investment recommendation.</strong></p>
+      <div class="btns enter" style="--d:300ms"><a class="btn btn-p" href="#summary">Read the summary ↗</a><a class="btn btn-g" href="#sources">View sources</a></div>
+      <p class="hmeta enter" style="--d:400ms">By <strong>Nikhil Kumar Vishwakrma</strong> · Bengaluru, Karnataka, India · Research cut-off 17 Nov 2026 · Report date 18 Nov 2026</p>
+    </div>
+    <aside class="card enter" style="--d:220ms" aria-labelledby="cq">
+      <span class="kicker">The central question</span>
+      <h2 class="ph" id="cq">Real technology, or a fragile financial structure?</h2>
+      <p>Is AI a real technology wave with an overextended investment cycle, or a tightly connected financial structure that could turn a correction into a wider crisis?</p>
+      <p class="q"><strong>Current evidence:</strong> a sharp AI-linked correction is credible. A 2008-scale crisis is not established by public evidence.</p>
+    </aside>
+  </div>
+  <div class="wrap stats">
+    <div class="card stat rv" style="--d:0ms"><b>$720–740B</b><span>Combined 2026 capital plans of four large tech firms (mixed definitions, not AI-only)</span></div>
+    <div class="card stat rv" style="--d:120ms"><b data-to="1.4" data-dec="1" data-pre="$" data-suf="T">$1.4T</b><span>Future revenue and purchase commitments in the IMF’s 14-deal sample</span></div>
+    <div class="card stat rv" style="--d:240ms"><b>485 → 950 TWh</b><span>Data-centre electricity use, 2025 to 2030 (IEA projection)</span></div>
+    <div class="card stat rv" style="--d:360ms"><b data-to="0.4" data-dec="1" data-pre="Up to " data-suf="%">Up to 0.4%</b><span>Lower global GDP in the IMF’s 2028 downside scenario, not a baseline forecast</span></div>
+  </div>
+  <div class="wrap"><p class="note">Each figure uses a different scope and period, so they should not be added together.</p></div>
+</section>
+
+<section class="sec" id="summary"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">01 · Executive summary</span>
+    <h2 class="h2">Real technology, uncertain payback.</h2>
+    <p class="lead">AI adoption is real. That does not prove every chip, data centre or long-term compute contract will earn an adequate return. The strongest case is for a meaningful correction risk; a broad financial crisis depends on credit, liquidity and counterparty channels failing together.</p>
+  </div>
+  <div class="call"><p>In KPMG’s Q1 2026 survey, <strong>64%</strong> of respondents said AI was delivering meaningful business value, while <strong>8%</strong> reported established ROI. These are self-reported enterprise outcomes, not an industry-wide investment return or project-level IRR.</p></div>
+  <div class="tw rv"><table>
+    <thead><tr><th>Signal</th><th>Reported scale</th><th>How to read it</th></tr></thead>
+    <tbody>
+    <tr><td><b>Investment scale</b></td><td>About $720–740B</td><td>Four large-company 2026 capital plans; mixed periods and definitions, not AI-only capex.</td></tr>
+    <tr><td><b>Circular financing sample</b></td><td>$300B equity; $650B associated debt; $1.4T future commitments</td><td>IMF sample of 14 disclosed transactions since 2023; overlapping parties with different economic meanings.</td></tr>
+    <tr><td><b>Investee obligations</b></td><td>About $320B</td><td>Guarantees, contingent and off-balance-sheet financing in the IMF sample.</td></tr>
+    <tr><td><b>Infrastructure load</b></td><td>485 → 950 TWh</td><td>IEA data-centre electricity, 2025 to 2030 projection; about 3% of global electricity by 2030.</td></tr>
+    <tr><td><b>2028 scenario</b></td><td>Global GDP up to 0.4% lower</td><td>IMF downside scenario from an AI investment unwind; a scenario, not a baseline forecast.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="g3">
+    <article class="card lift rv"><h3>Quality, returns and prices differ</h3><p>AI can transform work while specific projects or valuations disappoint.</p></article>
+    <article class="card lift rv"><h3>Visible buildout, blurred numbers</h3><p>Capex plans mix AI and non-AI spending and use different accounting periods.</p></article>
+    <article class="card lift rv"><h3>Circularity is economic</h3><p>Gross commitments are not current revenue or immediate debt.</p></article>
+    <article class="card lift rv"><h3>A correction can stay a correction</h3><p>A wider crisis needs missed payments, refinancing pressure, collateral calls and forced deleveraging.</p></article>
+    <article class="card lift rv"><h3>Watch cash conversion</h3><p>Paid usage, utilization, pricing, returns on capital and customer diversity matter most.</p></article>
+    <article class="card lift rv"><h3>No date, no probability</h3><p>The evidence does not establish a crash date or probability; the IMF’s downside result is a scenario.</p></article>
+  </div>
+</div></section>
+
+<section class="sec" id="system"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">02 · The connected system</span>
+    <h2 class="h2">Follow the money, compute and obligations.</h2>
+    <p class="lead">The useful model is a network with reinforcing loops, not a single chain. The same company can invest in a model lab, sell that lab cloud capacity, buy chips from a concentrated supplier and sign a long-dated capacity contract.</p>
+  </div>
+  <div class="sys">
+    <article class="card rv"><h3>1 · Capital &amp; credit</h3><p>Public equity, retained cash, banks, private credit, project vehicles, leases and guarantees.</p></article>
+    <article class="card rv"><h3>2 · Clouds &amp; model labs</h3><p>AWS, Azure, Google Cloud, OpenAI, Anthropic and others. Some firms invest in labs and also sell them compute.</p></article>
+    <article class="card rv"><h3>3 · Compute supply chain</h3><p>Accelerators, custom chips, high-bandwidth memory, foundries, networking, data centres, power and cooling.</p></article>
+    <article class="card rv"><h3>4 · Contracts &amp; capacity</h3><p>Multi-year cloud purchases, capacity reservations, leases, offtake agreements, guarantees and financing.</p></article>
+    <article class="card rv"><h3>5 · AI products &amp; apps</h3><p>API and subscription usage, enterprise copilots, training, inference and data services.</p></article>
+    <article class="card rv"><h3>6 · Customers &amp; cash</h3><p>Willingness to pay, productivity and retention, turning revenue into margin and free cash flow.</p></article>
+  </div>
+  <p class="loop"><b>Upside loop:</b> better AI → usage → revenue → cash generation → productive capacity investment.</p>
+  <p class="loop bad"><b>If payback lags:</b></p>
+  <div class="pill-row"><span class="pill">Utilization / pricing</span><span class="arr">→</span><span class="pill">Contracts / cash</span><span class="arr">→</span><span class="pill">Credit / collateral</span><span class="arr">→</span><span class="pill">Spillover to suppliers</span></div>
+  <p class="mt">The chain runs in six steps: capital enters; platforms hold two roles; capacity is financed before payback is certain; the same demand story travels through several balance sheets; productivity must become cash; and if demand disappoints, the chain runs backward.</p>
+  <div class="call"><p><strong>The key distinction</strong> is between a funding loop and an earnings loop. Financing can accelerate infrastructure, but only durable end-customer revenue and productivity savings validate the system over time. The core question: how many independent customers pay for workloads from cash they generate outside this same financing loop?</p></div>
+</div></section>
+
+<section class="sec" id="bubble"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">03 · Bubble risk</span>
+    <h2 class="h2">What the evidence supports.</h2>
+    <p class="lead">The evidence supports a serious risk of an AI-linked market correction. It does not support treating a broad financial-system crash as inevitable.</p>
+  </div>
+  <div class="g3">
+    <article class="card rv"><h3>Will AI be useful?</h3><p>Adoption, usage and cloud revenues say yes.</p></article>
+    <article class="card rv"><h3>Will every project earn enough?</h3><p>Whether each current data-centre project earns an adequate return is genuinely uncertain.</p></article>
+    <article class="card rv"><h3>Is the market priced for perfection?</h3><p>That is a market question. Lower growth or profits could cause a sharp repricing even while AI stays transformative.</p></article>
+  </div>
+  <p class="mt">The IMF’s October 2026 Global Financial Stability Report lists an AI-driven market correction among the salient risks. Core AI firms have delivered strong earnings, and forward valuation pressure eased in several markets. The boom has real business underneath it, while its financing footprint is large enough for disappointment to spread.</p>
+  <div class="card rv mt">
+    <h3>IMF sample: four different financing measures</h3>
+    <p class="sub">14 publicly disclosed transactions since 2023 · USD billions</p>
+    <div class="row"><span>Equity financing</span><span class="track"><i class="fill" style="--w:21%;--c:var(--blue)"></i></span><span class="val">~$300B</span></div>
+    <div class="row"><span>Associated debt</span><span class="track"><i class="fill" style="--w:46%;--c:var(--green)"></i></span><span class="val">~$650B</span></div>
+    <div class="row"><span>Future revenue / purchase commitments</span><span class="track"><i class="fill" style="--w:100%;--c:var(--gold)"></i></span><span class="val">~$1.4T</span></div>
+    <div class="row"><span>Debt at investees</span><span class="track"><i class="fill" style="--w:23%;--c:var(--red)"></i></span><span class="val">~$320B</span></div>
+    <p class="note">A bounded sample, not a census. Categories overlap, and long-term commitments are not revenue already earned, so the bars should not be summed.</p>
+  </div>
+  <div class="g3">
+    <article class="card rv"><h3>Michelle Bowman, Fed Vice Chair for Supervision</h3><p>AI debt is on track to exceed $800B in 2026, and long-term leases, contracts and residual guarantees are more than three times that. Most institutions are described as well capitalized, but the structures are hard to assess. Her scope differs from the IMF sample, so the figures are not additive.</p></article>
+    <article class="card rv"><h3>Federal Reserve Financial Stability Report, 13 Nov 2026</h3><p>Advanced-computing debt issuance exceeded $680B through October 2026. Over $1T of not-yet-commenced leases and over $2T of other obligations, including take-or-pay contracts and residual-value guarantees, are reported. Close to $1T of exposure sits at the largest US bank holding companies. Exposure is not a loss forecast.</p></article>
+    <article class="card rv"><h3>Governor Michael Barr, 16 Nov 2026</h3><p>Hyperscalers and GPU firms hold over $100B of cumulative equity in model labs and cloud start-ups that may buy compute from those same investors. Durability needs independent customer revenue. This is a risk pathway, not evidence of misconduct.</p></article>
+  </div>
+  <div class="call"><p>The market implication is not that every commitment will fail. The headline equity figure alone misses the wider obligation network. Analysts need entity-level maturity schedules, guarantees, customer concentration, refinancing terms and cash already received.</p></div>
+</div></section>
+
+<section class="sec" id="buildout"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">04 · Buildout</span>
+    <h2 class="h2">Capital spending, demand and physical limits.</h2>
+    <p class="lead">Large technology firms are committing extraordinary capital, but they are also growing and generating cash. The test is whether revenue, utilization and productivity can cover hardware, buildings, energy, leases and financing over time.</p>
+  </div>
+  <ul class="list">
+    <li><b>Demand is strong.</b> Amazon reported Q3 2026 AWS revenue growth of 39% year over year.</li>
+    <li><b>Cash is large, but the cushion is shrinking.</b> Microsoft reported $45.2B of capex in its first fiscal quarter of 2027, about three quarters of it in short-lived assets such as CPUs and GPUs. Operating cash flow was $58B and free cash flow $18.6B.</li>
+    <li><b>Adoption is broad.</b> Stanford’s 2026 AI Index reports 88% organizational adoption. Adoption does not show who captures the profit or how fast usage costs fall.</li>
+  </ul>
+  <div class="g2">
+    <div class="card rv">
+      <h3>2026 capital plans, four large tech firms</h3>
+      <p class="sub">Approximate US dollars, billions per year</p>
+      <div class="row"><span>Amazon</span><span class="track"><i class="fill" style="--w:88%;--c:var(--blue)"></i></span><span class="val">~220</span></div>
+      <div class="row"><span>Alphabet</span><span class="track"><i class="fill" style="--w:80%;--c:var(--green)"></i></span><span class="val">195–205</span></div>
+      <div class="row"><span>Meta</span><span class="track"><i class="fill" style="--w:56%;--c:var(--gold)"></i></span><span class="val">135–145</span></div>
+      <div class="row"><span>Microsoft</span><span class="track"><i class="fill" style="--w:68%;--c:var(--red)"></i></span><span class="val">~170</span></div>
+      <p class="note">Combined about $720–740B. Not an audited AI-only total: Amazon is cash capex, Meta includes finance lease principal, Microsoft is a calendar-year estimate, and Alphabet is company guidance.</p>
+    </div>
+    <div class="card rv">
+      <h3>Data-centre electricity demand</h3>
+      <p class="sub">IEA central projection, terawatt-hours per year</p>
+      <div class="row"><span>2025</span><span class="track"><i class="fill" style="--w:48.5%;--c:var(--blue)"></i></span><span class="val">485 TWh</span></div>
+      <div class="row"><span>2030 projection</span><span class="track"><i class="fill" style="--w:95%;--c:var(--green)"></i></span><span class="val">950 TWh</span></div>
+      <p class="note">Roughly 3% of global electricity by 2030. AI-focused facilities are the faster-growing subset. This is a forecast, not a fixed outcome.</p>
+    </div>
+  </div>
+  <h3 class="sh">Power and chips set a physical ceiling</h3>
+  <p class="mt">Grid connections, energy equipment, advanced chip manufacturing and high-bandwidth memory are near-term bottlenecks. They can delay delivery and revenue even when customer demand is strong. Electricity use by AI-focused data centres is projected to roughly triple over the period.</p>
+  <div class="call"><p><strong>Why investment can outrun returns.</strong> Capex is paid years before a data centre reaches high utilization. A sound project can still face a timing mismatch if grid connections or memory arrive late. Equipment can also become obsolete before leases and debt mature. The payoff depends on utilization, price per workload, power cost, hardware life and customer retention, not only on total demand.</p></div>
+</div></section>
+
+<section class="sec" id="links"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">05 · Company links</span>
+    <h2 class="h2">Interdependence, made tangible.</h2>
+    <p class="lead">“Every IT company depends on every other” overstates the evidence. The market is better described as a dense network with a few highly connected nodes.</p>
+  </div>
+  <div class="tw rv"><table>
+    <thead><tr><th>Disclosed link</th><th>What the filings say</th><th>Why it matters</th></tr></thead>
+    <tbody>
+    <tr><td><b>Amazon, AWS &amp; OpenAI</b></td><td>A $50B preferred-stock investment in OpenAI. AWS expanded a $38B multi-year arrangement by $100B over eight years.</td><td>Amazon is both investor and capacity seller, linking investment value to the customer’s ability to fund usage.</td></tr>
+    <tr><td><b>Amazon, AWS &amp; Anthropic</b></td><td>$10B of Anthropic preferred stock and a financing facility of up to $20B, subject to capacity milestones. The compute commitment grew by over $100B over ten years.</td><td>Equity, conditional financing and long-term compute sit in one relationship. A disclosed dependency, not proof of improper accounting.</td></tr>
+    <tr><td><b>Microsoft &amp; OpenAI</b></td><td>$10B of revenue from OpenAI arrangements in Q1 FY2027, $7.2B of receivables at 30 September, and $13B of funding commitments, $12B funded.</td><td>A receivable is not a loss, but customer financial strength matters under stress.</td></tr>
+    <tr><td><b>NVIDIA, CoreWeave &amp; customers</b></td><td>NVIDIA agreed to buy about $2B of CoreWeave shares. CoreWeave’s top two customers were 30% and 24% of Q3 revenue.</td><td>A chip vendor holds a stake in a provider that buys its chips. Concentration improved from 67% for the largest customer a year earlier, yet the top two still made up 54%.</td></tr>
+    <tr><td><b>Anthropic &amp; compute suppliers</b></td><td>The 17 Nov 2026 S-1/A-3 lists about $900.9B of purchase and lease commitments: $70.7B due within twelve months, $451.6B expected before 2031.</td><td>Spans several partners through 2045. Not debt due immediately, but shows dependence on very large, long-dated capacity.</td></tr>
+    </tbody>
+  </table></div>
+  <h3 class="sh">How OpenAI and Anthropic are funded</h3>
+  <p class="mt">Round totals, cumulative capital raised, available financing and compute commitments are different measures and should not be added together.</p>
+  <div class="g2">
+    <article class="card rv"><h3>OpenAI Group PBC (ChatGPT)</h3><p>The for-profit company controlled by the nonprofit OpenAI Foundation. On 31 March 2026 it announced $122B of committed capital at an $852B post-money valuation, anchored by Amazon, NVIDIA and SoftBank, with continued Microsoft participation. A roughly $4.7B revolving credit facility was undrawn at round close.</p></article>
+    <article class="card rv"><h3>Anthropic PBC (Claude)</h3><p>$141.1B of cumulative capital raised as of 30 September 2026. The Series G was $30B at a $380B post-money valuation; Series H was $65B at $965B, including $15B of previously committed hyperscaler investment, $5B of it from Amazon. Up to $77B of note-purchase capacity is disclosed; this is not cash already raised.</p></article>
+  </div>
+  <div class="call"><p><strong>NVIDIA is a central hinge.</strong> It is a major accelerator supplier, a strategic investor in OpenAI’s 2026 round, and the buyer of about $2B of CoreWeave shares. Labs are diversifying: OpenAI cites NVIDIA, AMD, AWS Trainium, Cerebras and custom silicon; Anthropic cites AWS Trainium, Google TPUs, NVIDIA and AMD GPUs. Capacity cannot switch instantly, so NVIDIA remains pivotal.</p></div>
+</div></section>
+
+<section class="sec" id="returns"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">06 · Returns</span>
+    <h2 class="h2">Weakly measured, not universally zero.</h2>
+    <p class="lead">“ROI” can mean customer productivity gains, cash returns on data-centre assets, or an investor’s realized gain. The public data do not provide one comparable, sector-wide AI IRR.</p>
+  </div>
+  <div class="g3">
+    <article class="card rv"><h3>Valuation is not return</h3><p>A funding round or private valuation is not a realized investor return, and total cloud capex is not AI-only investment.</p></article>
+    <article class="card rv"><h3>Survey gap, not a verdict</h3><p>KPMG’s 8% established-ROI figure points to a measurement and scaling gap, not proof that 92% of firms lost money.</p></article>
+    <article class="card rv"><h3>Productivity is not profit</h3><p>An NBER 2026 executive survey (WP 34984) finds positive but varying labor-productivity effects, expected to strengthen.</p></article>
+  </div>
+  <div class="call"><p><strong>The investment test is cash conversion.</strong> Incremental revenue or savings must cover model-serving costs, power, hardware depreciation, facilities and financing. Until firms report sustained returns above their cost of capital, AI’s benefits are real but payback from this buildout remains uneven and unproven.</p></div>
+</div></section>
+
+<section class="sec" id="history"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">07 · Historical crashes</span>
+    <h2 class="h2">What carries over, and what does not.</h2>
+  </div>
+  <div class="g2">
+    <article class="card rv"><h3>2000 · Dot-com</h3><p>Prices and expected profits ran ahead of durable cash generation, and telecom and internet capacity was overbuilt. The Nasdaq lost about 78%, and the US recession ran from March to November 2001. It was severe for investors but did not become a systemic banking crisis.</p></article>
+    <article class="card rv"><h3>2008 · Global financial crisis</h3><p>Housing losses were amplified by securitized credit, high leverage, short-term wholesale funding, opaque vehicles and fragile nonbank intermediaries. The S&amp;P 500 fell about 57% from October 2007 to March 2009.</p></article>
+  </div>
+  <div class="card rv mt">
+    <h3>Historical equity drawdowns</h3>
+    <p class="sub">Scale comparison only: different indexes, periods and macro conditions</p>
+    <div class="row"><span>Nasdaq · dot-com</span><span class="track"><i class="fill" style="--w:78%;--c:var(--blue)"></i></span><span class="val">−78%</span></div>
+    <div class="row"><span>S&amp;P 500 · GFC</span><span class="track"><i class="fill" style="--w:57%;--c:var(--red)"></i></span><span class="val">−57%</span></div>
+    <p class="note">AI has no identified peak or trough. These episodes explain mechanisms; they are not AI forecasts.</p>
+  </div>
+  <div class="tw rv"><table>
+    <thead><tr><th>Dimension</th><th>2000 dot-com</th><th>2008 GFC</th><th>AI buildout in 2026</th></tr></thead>
+    <tbody>
+    <tr><td><b>Core asset at risk</b></td><td>Tech and telecom equity; some uneconomic capacity</td><td>Housing-linked credit and structured mortgage securities</td><td>AI equities, compute, data-centre projects, long-dated contracts, private credit</td></tr>
+    <tr><td><b>Primary vulnerability</b></td><td>Speculative prices, weak cash generation, telecom overbuild</td><td>Leverage, maturity mismatch, opaque securitization, wholesale funding</td><td>Concentrated expectations, falling free cash flow, debt and contingent commitments</td></tr>
+    <tr><td><b>Potential amplifier</b></td><td>Wealth effects and retrenchment in venture and capex</td><td>Runs, collateral calls, forced sales, bank and dealer distress</td><td>Capex reset, credit repricing, failed offtake, guarantees, private-credit links</td></tr>
+    <tr><td><b>Important difference</b></td><td>Internet adoption became durable after valuations reset</td><td>Losses sat inside central funding and credit channels</td><td>Leaders have strong cash-generating cores; key exposures are concentrated and hard to measure</td></tr>
+    </tbody>
+  </table></div>
+  <div class="call"><p>Dot-com is the closer analogy for valuation and physical overbuild. 2008 is a transmission analogy, not a claim that today’s AI debt equals subprime mortgages. A sharp AI equity decline could destroy wealth without a broad recession; a systemic episode needs financing and counterparty channels that are large, concentrated, correlated and hard to refinance at the same time.</p></div>
+</div></section>
+
+<section class="sec" id="stress"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">08 · Stress pathways</span>
+    <h2 class="h2">From sector correction to wider crisis.</h2>
+    <p class="lead">The calculator keeps the report’s simple default so the arithmetic can be discussed without mistaking it for a forecast. Move the sliders to test your own assumptions. The exposures are hypothetical, not the author’s portfolio.</p>
+  </div>
+  <div class="g2" style="align-items:start">
+    <div class="card calc rv">
+      <label><span>AI-sensitive share of holdings <output id="o1">20%</output></span><input id="i1" type="range" min="0" max="100" value="20"></label>
+      <label><span>Decline in that AI-sensitive share <output id="o2">50%</output></span><input id="i2" type="range" min="0" max="100" value="50"></label>
+      <label><span>Decline in the remaining holdings <output id="o3">15%</output></span><input id="i3" type="range" min="0" max="100" value="15"></label>
+      <div class="res"><div><span>Total illustrated decline</span><b id="tot">22.0%</b></div><div><span>Per $100,000 starting value</span><b id="usd">$22,000</b></div></div>
+      <p class="note">Straight-line arithmetic only. It excludes correlations, leverage, taxes, currency, rebalancing and recovery, and is not a probability or suitability estimate.</p>
+    </div>
+    <div class="card rv">
+      <h3>Three possible paths</h3>
+      <ul class="list">
+        <li><b>Orderly digestion:</b> training demand normalizes and capacity arrives faster than billable workload. Strong core cash flows and falling compute costs absorb it.</li>
+        <li><b>Capex reset:</b> AI revenue lags promised paybacks, or cheaper methods cut compute per task. Long-term contracts, diversified customers and the ability to slow spending absorb it.</li>
+        <li><b>Broad risk-off:</b> a capex reset coincides with high rates, energy stress, private-credit outflows or several counterparties weakening together. Absorbed by transparent guarantee data, bank capital and liquidity, committed funding and market liquidity.</li>
+      </ul>
+    </div>
+  </div>
+  <h3 class="sh">Transmission channels and what to watch</h3>
+  <div class="tw rv"><table>
+    <thead><tr><th>Channel</th><th>Mechanism</th><th>Evidence to watch</th></tr></thead>
+    <tbody>
+    <tr><td><b>Cloud capex &amp; chip demand</b></td><td>Hyperscalers delay infrastructure and equipment orders fall.</td><td>Capex vs cash generation, orders, utilization, cancellations.</td></tr>
+    <tr><td><b>Customer &amp; supplier concentration</b></td><td>One large customer’s missed payment or renewal creates a financing gap.</td><td>Top-customer shares, receivables, collections, backlog conversion.</td></tr>
+    <tr><td><b>Leases, guarantees &amp; project vehicles</b></td><td>Off-balance-sheet commitments become hard obligations.</td><td>Lease obligations, residual-value guarantees, special-purpose entities.</td></tr>
+    <tr><td><b>Private credit &amp; bank facilities</b></td><td>Credit losses or redemptions shrink project financing.</td><td>Debt maturities, lender concentration, covenant headroom, undrawn facilities.</td></tr>
+    <tr><td><b>Equity concentration &amp; wealth</b></td><td>Falls in a few large tech stocks reduce wealth and risk appetite.</td><td>Index concentration, fund flows, equity-product leverage, forced sales.</td></tr>
+    <tr><td><b>Power, permitting &amp; useful life</b></td><td>Grid delays defer revenue; fast chip obsolescence shortens earning life.</td><td>Power delivered vs contracted, construction milestones, resale values, depreciation.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="call warn"><p><strong>The most credible route to a wider crisis</strong> is a demand shock hitting highly committed capacity providers and debt-funded projects, followed by a financing shock that forces several investors and lenders to sell or cut credit at once. Without those links, losses may be large but stay localized to equity investors, suppliers and specific lenders.</p></div>
+</div></section>
+
+<section class="sec" id="resilience"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">09 · Resilience</span>
+    <h2 class="h2">Reasons the thesis could be wrong.</h2>
+  </div>
+  <div class="g2">
+    <article class="card rv">
+      <h3>Why the boom may prove durable</h3>
+      <ul class="list">
+        <li>Leading cloud and tech firms have large, profitable non-AI businesses that can fund investment and absorb delays.</li>
+        <li>Usage, adoption and cloud revenues are growing, so not all demand relies on speculative financing.</li>
+        <li>Compute efficiency can improve quickly; Microsoft said engineering changes lifted GPU-fleet utilization.</li>
+        <li>Workloads can move across providers and chip types, which helps optimize price and performance.</li>
+      </ul>
+    </article>
+    <article class="card rv">
+      <h3>Why valuations or construction can overshoot</h3>
+      <ul class="list">
+        <li>Investment plans are made before long-run demand, pricing and model economics are known.</li>
+        <li>Competition can push inference prices down faster than compute costs fall.</li>
+        <li>A more efficient model can raise adoption while cutting hardware per unit of output, weaker for recently financed capacity.</li>
+        <li>Revenue commitments may be long-dated and depend on the payer’s continued access to capital.</li>
+      </ul>
+    </article>
+  </div>
+</div></section>
+
+<section class="sec" id="monitor"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">10 · Monitoring dashboard</span>
+    <h2 class="h2">Signals that matter.</h2>
+    <p class="lead">The most useful evidence is the conversion of spending into durable cash economics. Quarterly revenue growth alone is not enough; demand quality, utilization, customer concentration and financing terms matter.</p>
+  </div>
+  <div class="tw rv"><table>
+    <thead><tr><th>Signal</th><th>Strengthens correction concern</th><th>Weakens correction concern</th></tr></thead>
+    <tbody>
+    <tr><td><b>Cash return on infrastructure</b></td><td>Capex and depreciation rise while free cash flow or returns on invested capital fall for several quarters.</td><td>AI revenue grows faster than depreciation and operating cost.</td></tr>
+    <tr><td><b>Contract quality</b></td><td>Backlog comes mainly from a few related counterparties; cancellations rise.</td><td>Paying customers broaden across sectors; renewals confirm contracted demand.</td></tr>
+    <tr><td><b>Funding mix</b></td><td>Debt, private credit and lease guarantees replace internal cash; spreads widen.</td><td>Spending is funded mostly from operating cash; lenders disclose diversified exposures.</td></tr>
+    <tr><td><b>Capacity &amp; power</b></td><td>Large projects open without grid connection or customer load.</td><td>Facilities reach contracted power and high utilization.</td></tr>
+    <tr><td><b>Productivity &amp; willingness to pay</b></td><td>Usage rises but customers show no measurable savings.</td><td>Independent evidence of productivity, new revenue or lower cost, with renewals at commercial prices.</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<section class="sec" id="assessment"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">11 · Assessment &amp; scope</span>
+    <h2 class="h2">Where the evidence lands.</h2>
+  </div>
+  <div class="call"><p><strong>A sharp correction</strong> in AI-linked equities or specialist infrastructure is a credible outcome. <strong>A global crisis on the scale of 2008</strong> is not established by current public evidence. It becomes more plausible if opaque commitments, private credit, banks and concentrated counterparties turn a valuation reset into synchronized forced deleveraging.</p></div>
+  <div class="g2">
+    <article class="card rv">
+      <h3>Method</h3>
+      <ul class="list">
+        <li>Evidence runs through 17 November 2026, prioritizing official filings, earnings materials, central-bank and international-organization research, and the Stanford AI Index.</li>
+        <li>Company statements are treated as disclosures, not independent validation of management forecasts.</li>
+      </ul>
+    </article>
+    <article class="card rv">
+      <h3>Limits</h3>
+      <ul class="list">
+        <li>No personal holdings, time horizon, risk limits or India-specific tax context were supplied. The author is based in Bengaluru, Karnataka.</li>
+        <li>The report does not predict a crash date, assign probabilities to scenarios or recommend any security.</li>
+      </ul>
+    </article>
+  </div>
+</div></section>
+
+<section class="sec" id="sources"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">Sources and further reading</span>
+    <h2 class="h2">Primary filings and official research.</h2>
+    <p class="lead">All 32 references are public sources, prioritizing filings, official institutional research and public earnings materials.</p>
+  </div>
+  <ol class="src rv">
+    <li>IMF, Global Financial Stability Report, October 2026</li>
+    <li>IMF, GFSR Chapter 1: Beneath the Resilience, October 2026</li>
+    <li>IMF, Global Financial Markets Face Rising Risks, 13 October 2026</li>
+    <li>BIS Bulletin No. 140, Building AI on Credit, 27 October 2026</li>
+    <li>BIS Quarterly Review, Financing the AI Infrastructure Boom, 16 March 2026</li>
+    <li>Michelle W. Bowman, speech at the Council on Foreign Relations, 10 November 2026</li>
+    <li>IEA, Key Questions on Energy and AI, 2026 update</li>
+    <li>Stanford HAI, The 2026 AI Index Report, 2026</li>
+    <li>Alphabet, Form 10-Q for quarter ended 30 September 2026</li>
+    <li>Amazon, Form 10-Q for quarter ended 30 September 2026</li>
+    <li>Microsoft, Form 10-Q for quarter ended 30 September 2026</li>
+    <li>CoreWeave, Form 10-Q for quarter ended 30 September 2026</li>
+    <li>Anthropic, PBC, Form S-1/A-3, 17 November 2026</li>
+    <li>Microsoft, FY2027 First Quarter Earnings Conference Call, October 2026</li>
+    <li>Alphabet, Q3 2026 Earnings Call, October 2026</li>
+    <li>Meta Platforms, Q3 2026 Results, October 2026</li>
+    <li>Amazon.com, Q3 2026 Results, 29 October 2026</li>
+    <li>IMF, Global Financial Stability Report: Market Developments and Issues, September 2003</li>
+    <li>Federal Reserve History, The Great Recession of 2007–09</li>
+    <li>Ben S. Bernanke, Some Reflections on the Crisis and the Policy Response, 13 April 2012</li>
+    <li>Ben S. Bernanke, Causes of the Recent Financial and Economic Crisis, 2 September 2010</li>
+    <li>NBER, US Business Cycle Expansions and Contractions</li>
+    <li>NBER, Business Cycle Dating Committee Announcement on the November 2001 Trough, 17 July 2003</li>
+    <li>Federal Reserve Board, Financial Stability Report, November 2026, Box 2.2</li>
+    <li>Michael S. Barr, “Some Potential Financial Stability Implications of Artificial Intelligence,” 16 November 2026</li>
+    <li>OpenAI, “Accelerating the next phase of AI,” 31 March 2026</li>
+    <li>OpenAI, “Scaling AI for everyone,” 27 February 2026</li>
+    <li>OpenAI, “Our Structure,” updated 28 October 2025</li>
+    <li>Anthropic, Series G announcement, 12 February 2026</li>
+    <li>Anthropic, Series H announcement, 28 May 2026</li>
+    <li>KPMG, Global AI Pulse Q1 2026, April 2026</li>
+    <li>NBER Working Paper 34984, Artificial Intelligence, Productivity, and the Workforce, 2026</li>
+  </ol>
+</div></section>
+
+<section class="sec" id="contact"><div class="wrap">
+  <div class="sechead">
+    <span class="kicker">Contact</span>
+    <h2 class="h2">Let’s talk about AI, markets and risk.</h2>
+    <p class="lead">Nikhil Kumar Vishwakrma · Bengaluru, Karnataka, India</p>
+  </div>
+  <div class="lks">
+    <a class="lk" href="mailto:nikhilvishwakrma2002@gmail.com"><small>Email</small><span>nikhilvishwakrma2002@gmail.com</span></a>
+    <a class="lk" href="tel:+916393004528"><small>Phone</small><span>+91 6393004528</span></a>
+    <a class="lk" href="https://wa.me/916393004528" target="_blank" rel="noopener"><small>WhatsApp</small><span>+91 6393004528</span></a>
+    <a class="lk" href="https://www.linkedin.com/in/nikhilvishwakrma2002" target="_blank" rel="noopener"><small>LinkedIn</small><span>nikhilvishwakrma2002</span></a>
+    <a class="lk" href="https://github.com/nikhilvishwakrma2002" target="_blank" rel="noopener"><small>GitHub</small><span>nikhilvishwakrma2002</span></a>
+    <a class="lk" href="https://www.instagram.com/nikhilvishwakrma2002/" target="_blank" rel="noopener"><small>Instagram</small><span>nikhilvishwakrma2002</span></a>
+    <a class="lk" href="https://t.me/nikhilvishwakrma" target="_blank" rel="noopener"><small>Telegram</small><span>nikhilvishwakrma</span></a>
+    <a class="lk" href="https://nikhilvishwakrma2002.github.io/nikhil/" target="_blank" rel="noopener"><small>Portfolio</small><span>nikhilvishwakrma2002.github.io/nikhil</span></a>
+  </div>
+</div></section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p>Prepared by <strong style="color:var(--gold2)">Nikhil Kumar Vishwakrma</strong> 🇮🇳 · Lucknow, INDIA · 18 November 2026</p>
+    <p style="margin-top:6px">Research and education only. Not investment advice. Evidence through 17 November 2026. <a href="#top">Back to top ↑</a></p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var $=function(s){return document.querySelector(s)};
+  var all=function(l){return [].slice.call(l)};
+  var io="IntersectionObserver" in window;
+
+  /* Stagger cards inside each grid, then reveal on scroll */
+  all(document.querySelectorAll(".g2,.g3,.sys")).forEach(function(g){
+    all(g.children).forEach(function(c,i){ if(c.classList.contains("rv")) c.style.setProperty("--d",Math.min(i,5)*110+"ms"); });
+  });
+  var targets=all(document.querySelectorAll(".rv,.sec"));
+  if(io&&!reduce){
+    var ro=new IntersectionObserver(function(es,o){es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("in"); o.unobserve(e.target); } });},{threshold:.12,rootMargin:"0px 0px -40px 0px"});
+    targets.forEach(function(t){ro.observe(t)});
+  } else targets.forEach(function(t){t.classList.add("in")});
+
+  /* Count-up for the hero figures */
+  if(!reduce) all(document.querySelectorAll("[data-to]")).forEach(function(el){
+    var to=+el.dataset.to,d=+(el.dataset.dec||0),p=el.dataset.pre||"",s=el.dataset.suf||"",t0=null;
+    function f(ts){ if(t0===null)t0=ts; var t=Math.min((ts-t0)/1400,1); el.textContent=p+(to*(1-Math.pow(1-t,3))).toFixed(d)+s; if(t<1)requestAnimationFrame(f); }
+    requestAnimationFrame(f);
+  });
+
+  /* Highlight the nav link for the section in view */
+  var links=all(document.querySelectorAll(".links a[href^='#']"));
+  if(io){
+    var so=new IntersectionObserver(function(es){es.forEach(function(e){ if(e.isIntersecting) links.forEach(function(a){ a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id); }); });},{rootMargin:"-45% 0px -50% 0px"});
+    all(document.querySelectorAll("main section[id]")).forEach(function(s){so.observe(s)});
+  }
+
+  /* Scroll progress and header state, one update per frame */
+  var hd=$(".top"),pg=$(".progress"),tk=0;
+  function onScroll(){ tk=0; var y=scrollY,m=document.documentElement.scrollHeight-innerHeight; pg.style.transform="scaleX("+(m>0?Math.min(y/m,1):0)+")"; hd.classList.toggle("is-scrolled",y>12); }
+  addEventListener("scroll",function(){ if(!tk) tk=requestAnimationFrame(onScroll); },{passive:true});
+  onScroll();
+
+  /* Mobile navigation */
+  var tg=$(".nav-toggle"),nv=$(".links");
+  tg.addEventListener("click",function(){ var o=nv.classList.toggle("open"); tg.setAttribute("aria-expanded",String(o)); tg.setAttribute("aria-label",o?"Close navigation":"Open navigation"); });
+  all(nv.querySelectorAll("a")).forEach(function(a){ a.addEventListener("click",function(){ nv.classList.remove("open"); tg.setAttribute("aria-expanded","false"); }); });
+
+  /* Constellation background: particles drift on gentle currents; paused while scrolling so scrolling stays smooth */
+  var cv=$(".network"),cx=cv.getContext("2d"),W=0,H=0,P=[],raf=0,last=0,halo=document.createElement("canvas");
+  halo.width=halo.height=24;
+  var hg=halo.getContext("2d"),gr=hg.createRadialGradient(12,12,0,12,12,12);
+  gr.addColorStop(0,"rgba(241,223,180,.55)");gr.addColorStop(.4,"rgba(241,223,180,.12)");gr.addColorStop(1,"rgba(241,223,180,0)");
+  hg.fillStyle=gr;hg.fillRect(0,0,24,24);
+  function pt(){ var a=Math.random()*6.2832,z=.35+Math.random()*.65,s=(6+Math.random()*8)*(.45+z*.7),vx=Math.cos(a)*s,vy=Math.sin(a)*s; return {x:Math.random()*W,y:Math.random()*H,vx:vx,vy:vy,bx:vx,by:vy,z:z,ph:Math.random()*6.2832}; }
+  function size(){
+    W=innerWidth;H=innerHeight;
+    var d=Math.min(devicePixelRatio||1,1.25);
+    cv.width=Math.round(W*d);cv.height=Math.round(H*d);cx.setTransform(d,0,0,d,0,0);
+    var n=Math.max(16,Math.min(34,Math.round(W*H/44000)));
+    while(P.length<n) P.push(pt());
+    P.length=n;
+    P.forEach(function(p){ p.x=Math.min(p.x,W); p.y=Math.min(p.y,H); });
+  }
+  function draw(t){
+    raf=0;
+    if(document.hidden) return;
+    if(last&&t-last<33){ raf=requestAnimationFrame(draw); return; }
+    var dt=last?Math.min((t-last)/1000,.05):0; last=t;
+    cx.clearRect(0,0,W,H);
+    var L=Math.max(116,Math.min(156,Math.min(W,H)*.17)),br=1+(reduce?0:Math.sin(t*.00045)*.12);
+    P.forEach(function(p){
+      if(!dt) return;
+      var k=Math.sin(t*.00022+p.ph)*.12*dt,c=Math.cos(k),s=Math.sin(k),nx=p.bx*c-p.by*s;
+      p.by=p.bx*s+p.by*c;p.bx=nx;
+      var r=Math.min(1,dt*1.5);p.vx+=(p.bx-p.vx)*r;p.vy+=(p.by-p.vy)*r;
+      p.x+=p.vx*dt;p.y+=p.vy*dt;
+      if(p.x<-20)p.x+=W+40;else if(p.x>W+20)p.x-=W+40;
+      if(p.y<-20)p.y+=H+40;else if(p.y>H+20)p.y-=H+40;
+    });
+    cx.strokeStyle="#d8c18e";cx.lineWidth=.8;cx.globalAlpha=.26*br;cx.beginPath();
+    for(var i=0;i<P.length;i++){ var a=P[i]; for(var j=i+1;j<P.length;j++){ var b=P[j],dx=a.x-b.x,dy=a.y-b.y; if(dx*dx+dy*dy<L*L){ cx.moveTo(a.x,a.y); cx.lineTo(b.x,b.y); } } }
+    cx.stroke();
+    P.forEach(function(p){
+      var pu=reduce?0:Math.sin(t*.0012+p.ph),g=10+p.z*10;
+      cx.globalAlpha=Math.max(0,(.22+p.z*.3)*(1+pu*.2));
+      cx.drawImage(halo,p.x-g/2,p.y-g/2,g,g);
+      cx.globalAlpha=Math.min(1,.45+p.z*.4+pu*.1);
+      cx.fillStyle="#f1dfb4";cx.beginPath();cx.arc(p.x,p.y,.75+p.z+(pu+1)*.15*p.z,0,6.2832);cx.fill();
+    });
+    cx.globalAlpha=1;
+    if(!reduce) raf=requestAnimationFrame(draw);
+  }
+  function go(){ if(!reduce&&!raf&&!document.hidden){ last=0; raf=requestAnimationFrame(draw); } }
+  size();
+  if(reduce) draw(0); else go();
+  var st=0,rs=0;
+  addEventListener("scroll",function(){ if(reduce) return; if(raf){ cancelAnimationFrame(raf); raf=0; } clearTimeout(st); st=setTimeout(go,160); },{passive:true});
+  document.addEventListener("visibilitychange",function(){ if(document.hidden){ cancelAnimationFrame(raf); raf=0; } else go(); });
+  addEventListener("resize",function(){ clearTimeout(rs); rs=setTimeout(function(){ if(Math.abs(innerWidth-W)>0||Math.abs(innerHeight-H)>120){ size(); if(reduce) draw(0); } },180); },{passive:true});
+
+  /* Stress-test calculator: straight-line arithmetic from the report */
+  function calc(){
+    var a=+$("#i1").value,b=+$("#i2").value,c=+$("#i3").value,t=(a*b+(100-a)*c)/100;
+    $("#o1").textContent=a+"%";$("#o2").textContent=b+"%";$("#o3").textContent=c+"%";
+    $("#tot").textContent=t.toFixed(1)+"%";
+    $("#usd").textContent="$"+Math.round(t*1000).toLocaleString("en-US");
+  }
+  ["#i1","#i2","#i3"].forEach(function(s){ $(s).addEventListener("input",calc); });
+  calc();
+})();
+</script>
+</body>
+</html>
